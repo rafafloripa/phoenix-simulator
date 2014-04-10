@@ -3,6 +3,7 @@ package acceptancetest.subscribe;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import simulator.Simulator;
+import cucumber.api.CucumberOptions;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
