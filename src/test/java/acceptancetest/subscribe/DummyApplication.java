@@ -26,6 +26,7 @@ public class DummyApplication {
 			@Override
 			public void receive(int signalID, byte[] data) {
 				signalStorage.put(signalID, (int) data[0]);
+				System.err.print(data[0]);
 			}
 		});
 

@@ -6,8 +6,8 @@ import com.swedspot.sdp.observer.SDPNode;
 import com.swedspot.sdp.routing.SDPNodeEthAddress;
 
 public class Simulator {
-	SDPNode simulatorNode;
-	SDPGatewayNode simulatorGateway;
+	private SDPNode simulatorNode;
+	private SDPGatewayNode simulatorGateway;
 
 	public void setupSignal(int signalID, int startingValue) throws InterruptedException {
 		simulatorNode = SDPFactory.createNodeInstance();
@@ -22,4 +22,7 @@ public class Simulator {
 		simulatorNode.send(signalID, new byte[] { (byte) newValue });
 	}
 
+	public void stop(){
+		simulatorGateway.stop();
+	}
 }
