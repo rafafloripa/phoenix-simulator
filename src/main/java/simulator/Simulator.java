@@ -11,6 +11,15 @@ public class Simulator {
 	private SDPNode simulatorNode;
 	private SDPGatewayNode simulatorGateway;
 	private SCS node;
+	
+	public void setupNode(){
+		simulatorNode = SDPFactory.createNodeInstance();
+
+		simulatorGateway = SDPFactory.createGatewayClientInstance();
+		simulatorGateway.init(new SDPNodeEthAddress("localhost", 8126), simulatorNode);
+		simulatorGateway.start();
+		node = SCSFactory.createSCSInstance(simulatorNode);
+	}
 
 	public void setupSignal(int signalID, int startingValue) throws InterruptedException {
 		simulatorNode = SDPFactory.createNodeInstance();

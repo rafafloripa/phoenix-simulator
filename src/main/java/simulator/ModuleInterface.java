@@ -1,6 +1,6 @@
 package simulator;
 
-public interface ModuleInterface {
-	public void start();
-	public void stop();	
+public interface ModuleInterface extends Runnable {
+	public void startSimulation();
+	public void stopSimulation();
 }
