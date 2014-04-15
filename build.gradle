@@ -24,6 +24,7 @@ dependencies {
     testCompile 'info.cukes:cucumber-java:1.1.6'
     testCompile 'info.cukes:cucumber-junit:1.1.6'
     testCompile 'info.cukes:cucumber-core:1.1.6'
+    testCompile 'org.slf4j:slf4j-log4j12:1.7.6'
 }
 
 task downloadSDP(type: MyDownload) {
@@ -65,7 +66,7 @@ task acceptanceTest() {
         javaexec {
             main = "cucumber.api.cli.Main"
             classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['-f', 'pretty', '--glue', 'acceptancetest', 'src/test/java/acceptancetest/']
+            args = ['-f', 'pretty', '--monochrome', '--glue', 'acceptancetest', 'src/test/java/acceptancetest']
         }
     }
 }

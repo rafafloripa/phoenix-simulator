@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.swedspot.scs.SCS;
@@ -14,22 +15,25 @@ public class StorageFileReader implements ModuleInterface {
 	private Simulator					simulator;
 	private SCS							node;
 	private BufferedReader				br;
-	private LinkedList<ReplayerDataRow>	dataValues;
+	private ArrayList<ReplayerDataRow>	dataValues;
 	private LinkedList<Integer>			providedIDs;
 	private int							index;
 	private long						timeDiff;
 	private long						previousTimestamp;
 	private boolean						isRunning	= false;
+	ReplayerDataRow 					current;
+	int 								data;
 	
 	public StorageFileReader(Simulator simu) {
 		simulator = simu;
 		node = simulator.getNode();
-		dataValues = new LinkedList<>();
+		dataValues = new ArrayList<>();
 		providedIDs = new LinkedList<>();
 	}
 	
 	public boolean readFile(File file) throws IOException {
 		br = new BufferedReader(new FileReader(file));
+		System.err.println("file exists: "+file.exists());
 		String newLine = "";
 		int id;
 		long timestamp;
@@ -63,7 +67,7 @@ public class StorageFileReader implements ModuleInterface {
 	public void startSimulation() {
 		if (!dataValues.isEmpty()) {
 			index = 0;
-			previousTimestamp = dataValues.getFirst().getTimestamp();
+			previousTimestamp = dataValues.get(0).getTimestamp();
 			isRunning = true;
 		}
 	}
@@ -77,9 +81,8 @@ public class StorageFileReader implements ModuleInterface {
 	@Override
 	public void run() {
 		try {
-			ReplayerDataRow current = dataValues.get(index);
-			int data;
 			while (isRunning) {
+				current = dataValues.get(index);
 				timeDiff = current.getTimestamp() - previousTimestamp;
 				if(timeDiff > 0){
 //					System.out.println("index: " + index + ", sleeping for:" + timeDiff);
@@ -95,8 +98,6 @@ public class StorageFileReader implements ModuleInterface {
 					stopSimulation();
 					break;
 				}
-				current = dataValues.get(index);
-				
 			}
 			Thread.sleep(100);
 			run();

@@ -2,6 +2,7 @@ package simulator;
 
 import com.swedspot.scs.SCS;
 import com.swedspot.scs.SCSFactory;
+import com.swedspot.scs.data.Uint32;
 import com.swedspot.sdp.SDPFactory;
 import com.swedspot.sdp.observer.SDPGatewayNode;
 import com.swedspot.sdp.observer.SDPNode;
@@ -22,17 +23,12 @@ public class Simulator {
 	}
 
 	public void setupSignal(int signalID, int startingValue) throws InterruptedException {
-		simulatorNode = SDPFactory.createNodeInstance();
-
-		simulatorGateway = SDPFactory.createGatewayClientInstance();
-		simulatorGateway.init(new SDPNodeEthAddress("localhost", 8126), simulatorNode);
-		simulatorGateway.start();
-		simulatorNode.provide(signalID);
-		node = SCSFactory.createSCSInstance(simulatorNode);
+		node.provide(signalID);
 	}
 
 	public void changeValue(int signalID, int newValue) {
-		simulatorNode.send(signalID, new byte[] { (byte) newValue });
+//		simulatorNode.send(signalID, new byte[] { (byte) newValue });
+		node.send(signalID, new Uint32(newValue));
 	}
 
 	public void stop(){

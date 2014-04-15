@@ -6,7 +6,5 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(monochrome = true)
-public class ReadFileTest {
-
-}
+@CucumberOptions(features = "classpath:acceptanceTest/readfile/readFile.feature", glue = { "acceptancetest.readfile",  "acceptancetest.util" }, monochrome = true, format = "pretty")
+public class ReadFileTest {}
