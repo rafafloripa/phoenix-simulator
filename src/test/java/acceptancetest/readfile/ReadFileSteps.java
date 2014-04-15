@@ -1,23 +1,20 @@
 package acceptancetest.readfile;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
+import simulator.filereplayer.FileReplayer;
 import acceptancetest.util.DummyApplication;
 import acceptancetest.util.Util;
-import simulator.Simulator;
-import simulator.StorageFileReader;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 public class ReadFileSteps {
-
-	StorageFileReader reader;
-	
 
 
 	@Given("^The DummyApp has subscribed to signal (\\d+)$")
@@ -33,15 +30,14 @@ public class ReadFileSteps {
 		System.err.println(new java.io.File( "." ).getCanonicalPath());
 	    File exampleData = new File("testResources/ExampleData");
 	    assertTrue(exampleData.exists());
-	    reader = new StorageFileReader(Util.staticSimulator);
+		FileReplayer reader = new FileReplayer();
+	    Util.staticSimulator.addSimulationModule(reader);
 	    assertTrue(reader.readFile(exampleData));
 	}
 
 	@When("^The simulator start replaying$")
 	public void the_simulator_start_replaying() throws Throwable {
-	    reader.startSimulation();
-	    Thread runThis = new Thread(reader);
-	    runThis.start();
+		Util.staticSimulator.startSimulation();
 	}
 
 	@Then("^The DummyApp should wait for the simulator to finish sending all data$")

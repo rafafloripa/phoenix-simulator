@@ -11,7 +11,7 @@ public class CommonSteps {
 	public void shutdownNodeStep()
 	{
 		try {
-			Util.staticSimulator.stop();
+			Util.staticSimulator.stopSimulation();
 			Util.staticDummyApp.stop();
 		} catch (Exception e) {}
 	}
@@ -19,7 +19,7 @@ public class CommonSteps {
 	@Given("^The simulator is setup and running$")
 	public void setupSimulator() throws Throwable {
 		Util.staticSimulator = new Simulator();
-		Util.staticSimulator.setupNode();
+		Util.staticSimulator.init();
 	}
 	
 	@And("^After (\\d+) mSec have passed$")

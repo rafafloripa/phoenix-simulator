@@ -1,4 +1,4 @@
-package simulator;
+package simulator.filereplayer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,14 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
-import com.swedspot.scs.SCS;
+import simulator.BasicModule;
 import com.swedspot.scs.data.Uint32;
 
-public class StorageFileReader implements ModuleInterface {
+public class FileReplayer extends BasicModule implements Runnable {
 	
-	private Simulator					simulator;
-	private SCS							node;
 	private BufferedReader				br;
 	private ArrayList<ReplayerDataRow>	dataValues;
 	private LinkedList<Integer>			providedIDs;
@@ -21,12 +18,11 @@ public class StorageFileReader implements ModuleInterface {
 	private long						timeDiff;
 	private long						previousTimestamp;
 	private boolean						isRunning	= false;
-	ReplayerDataRow 					current;
-	int 								data;
+	private ReplayerDataRow 			current;
+	private int 						data;
+	private Thread 						storageFileReaderThread;
 	
-	public StorageFileReader(Simulator simu) {
-		simulator = simu;
-		node = simulator.getNode();
+	public FileReplayer() {
 		dataValues = new ArrayList<>();
 		providedIDs = new LinkedList<>();
 	}
@@ -43,7 +39,7 @@ public class StorageFileReader implements ModuleInterface {
 			id = Integer.parseInt(extractData(data[1]));
 			if (!providedIDs.contains(id)) {
 				providedIDs.add(id);
-				node.provide(id);
+				simulator.getNode().provide(id);
 			}
 			timestamp = Long.parseLong(extractData(data[0]));
 			dataValues.add(new ReplayerDataRow(id, extractData(data[2]),
@@ -59,16 +55,14 @@ public class StorageFileReader implements ModuleInterface {
 				trimmedData.length());
 	}
 	
-	/***
-	 * 
-	 * called
-	 */
 	@Override
 	public void startSimulation() {
 		if (!dataValues.isEmpty()) {
 			index = 0;
 			previousTimestamp = dataValues.get(0).getTimestamp();
 			isRunning = true;
+			storageFileReaderThread = new Thread(this);
+			storageFileReaderThread.start();
 		}
 	}
 	
@@ -76,6 +70,11 @@ public class StorageFileReader implements ModuleInterface {
 	public void stopSimulation() {
 		isRunning = false;
 		index = 0;
+		try {
+			storageFileReaderThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -90,7 +89,7 @@ public class StorageFileReader implements ModuleInterface {
 				}
 				// TODO are all values going to be integers? Fix if not!
 				data = Integer.parseInt(current.getData());
-				node.send(current.getSignalID(), new Uint32(data));
+				simulator.getNode().send(current.getSignalID(), new Uint32(data));
 //				System.err.println("Sent: signalID: "+current.getSignalID() + ", data: "+current.getData());
 				previousTimestamp = current.getTimestamp();
 				index++;
@@ -99,10 +98,22 @@ public class StorageFileReader implements ModuleInterface {
 					break;
 				}
 			}
-			Thread.sleep(100);
-			run();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void pauseSimulation() throws Exception {
+		throw new Exception("Pause is not supported"); 
+		
+	}
+
+	@Override
+	public void resumeSimulation() throws Exception {
+		throw new Exception("Resume is not supported");
+		
+	}
+
+
 }

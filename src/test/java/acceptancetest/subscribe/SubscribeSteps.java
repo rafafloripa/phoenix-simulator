@@ -1,14 +1,12 @@
 package acceptancetest.subscribe;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import acceptancetest.util.DummyApplication;
 import acceptancetest.util.Util;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import cucumber.runtime.java.StepDefAnnotation;
 
 public class SubscribeSteps {
 

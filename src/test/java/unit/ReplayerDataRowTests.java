@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import simulator.ReplayerDataRow;
-import simulator.StorageFileReader;
+import simulator.filereplayer.ReplayerDataRow;
+import simulator.filereplayer.FileReplayer;
 
 public class ReplayerDataRowTests {
 	
@@ -54,21 +54,21 @@ public class ReplayerDataRowTests {
 	@Test
 	public void extractData_timestamp_return431(){
 		String data[] = testExtractDataToExtract.split(",");
-		long timestamp = Long.parseLong(StorageFileReader.extractData(data[0]));
+		long timestamp = Long.parseLong(FileReplayer.extractData(data[0]));
 		assertEquals(431, timestamp);
 	}
 	
 	@Test
 	public void extractData_name_return0001(){
 		String data[] = testExtractDataToExtract.split(",");
-		String id = StorageFileReader.extractData(data[1]);
+		String id = FileReplayer.extractData(data[1]);
 		assertEquals("0001", id);
 	}
 	
 	@Test
 	public void extractData_value_return100(){
 		String data[] = testExtractDataToExtract.split(",");
-		int value = Integer.parseInt(StorageFileReader.extractData(data[2]));
+		int value = Integer.parseInt(FileReplayer.extractData(data[2]));
 		assertEquals(100, value);
 	}
 }

@@ -1,5 +1,7 @@
 package simulator;
 
+import java.util.ArrayList;
+
 import com.swedspot.scs.SCS;
 import com.swedspot.scs.SCSFactory;
 import com.swedspot.scs.data.Uint32;
@@ -12,14 +14,16 @@ public class Simulator {
 	private SDPNode simulatorNode;
 	private SDPGatewayNode simulatorGateway;
 	private SCS node;
+	private ArrayList<BasicModule> availableModules = new ArrayList<BasicModule>(); 
+	private SimulationState simulationState = SimulationState.STOPPED; 
 	
-	public void setupNode(){
+	public void init(){
 		simulatorNode = SDPFactory.createNodeInstance();
-
 		simulatorGateway = SDPFactory.createGatewayClientInstance();
 		simulatorGateway.init(new SDPNodeEthAddress("localhost", 8126), simulatorNode);
 		simulatorGateway.start();
 		node = SCSFactory.createSCSInstance(simulatorNode);
+		simulationState = SimulationState.INITIALIZED; 
 	}
 
 	public void setupSignal(int signalID, int startingValue) throws InterruptedException {
@@ -27,17 +31,52 @@ public class Simulator {
 	}
 
 	public void changeValue(int signalID, int newValue) {
-//		simulatorNode.send(signalID, new byte[] { (byte) newValue });
 		node.send(signalID, new Uint32(newValue));
 	}
 
-	public void stop(){
+	public void startSimulation() throws Exception
+	{
+		for (BasicModule module : availableModules)
+			module.startSimulation();
+		simulationState = SimulationState.RUNNING; 
+	}
+	
+	public void stopSimulation() throws Exception{
+		for (BasicModule module : availableModules)
+			module.startSimulation();
+		
 		simulatorGateway.stop();
+		simulationState = SimulationState.STOPPED; 
+
+	}
+	public void pauseSimulation() throws Exception{
+		for (BasicModule module : availableModules)
+			module.pauseSimulation();
+		simulationState = SimulationState.PAUSED;
+	}
+	public void resumeSimulation() throws Exception{
+		for (BasicModule module : availableModules)
+			module.resumeSimulation();
+		simulationState = SimulationState.RUNNING;
 	}
 	
 	public SCS getNode()
 	{
 		return node;
+	}
+	
+	public void addSimulationModule(BasicModule simulationModule)
+	{
+		availableModules.add(simulationModule);
+		simulationModule.setSimulator(this);
+	}
+
+	public SimulationState getSimulationState() {
+		return simulationState;
+	}
+
+	public void setSimulationState(SimulationState simulationState) {
+		this.simulationState = simulationState;
 	}
 	
 }

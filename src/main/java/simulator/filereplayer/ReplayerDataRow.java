@@ -1,4 +1,4 @@
-package simulator;
+package simulator.filereplayer;
 
 public class ReplayerDataRow implements Comparable<ReplayerDataRow> {
 	
