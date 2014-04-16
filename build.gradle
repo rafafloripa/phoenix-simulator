@@ -32,9 +32,9 @@ task downloadSDP(type: MyDownload) {
     target = file('libs/SDP-1.0-SNAPSHOT.jar')
 }
 
-task downloadAgaConfig(type: MyDownload) {
-    sourceUrl = 'http://developer.lindholmen.se/repo/AGA-Config-1.0-SNAPSHOT.jar'
-    target = file('libs/AGA-Config-1.0-SNAPSHOT.jar')
+task downloadVilConfig(type: MyDownload) {
+    sourceUrl = 'http://developer.lindholmen.se/repo/VIL-1.0-SNAPSHOT.jar'
+    target = file('libs/VIL-1.0-SNAPSHOT.jar')
 }
 
 class MyDownload extends DefaultTask {
@@ -51,7 +51,7 @@ class MyDownload extends DefaultTask {
 }
 
 compileJava.dependsOn downloadSDP
-compileJava.dependsOn downloadAgaConfig
+compileJava.dependsOn downloadVilConfig
 task libsClean(type: Delete) {
     delete 'libs'
 }
