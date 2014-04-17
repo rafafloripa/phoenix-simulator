@@ -1,5 +1,5 @@
 package simulator;
 
 public enum SimulationState {
-	INITIALIZED, RUNNING, PAUSED, STOPPED
+    INITIALIZED, RUNNING, PAUSED, STOPPED
 }

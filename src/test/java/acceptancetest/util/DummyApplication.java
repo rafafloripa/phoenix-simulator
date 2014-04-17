@@ -1,6 +1,5 @@
 package acceptancetest.util;
 
-
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -17,62 +16,62 @@ import com.swedspot.sdp.routing.SDPNodeEthAddress;
 import com.swedspot.sdp.util.Converter;
 
 public class DummyApplication {
-	SDPNode dummyAppNode;
-	SDPGatewayNode dummyAppGateway;
-	SCS dummySCSNode;
-	HashMap<Integer, Integer> signalStorage = new HashMap<>();
-	LinkedList<Integer> receivedData = new LinkedList<>();
+    SDPNode dummyAppNode;
+    SDPGatewayNode dummyAppGateway;
+    SCS dummySCSNode;
+    HashMap<Integer, Integer> signalStorage = new HashMap<>();
+    LinkedList<Integer> receivedData = new LinkedList<>();
 
-	public DummyApplication() throws InterruptedException {
+    public DummyApplication() throws InterruptedException {
 
-		dummyAppNode = SDPFactory.createNodeInstance();
+        dummyAppNode = SDPFactory.createNodeInstance();
 
-		dummyAppGateway = SDPFactory.createGatewayServerInstance();
-		dummyAppGateway.init(new SDPNodeEthAddress("localhost", 8126), dummyAppNode);
-		dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode);
-		dummySCSNode.setDataListener(new SCSDataListener() {
-			
-			@Override
-			public SCSData request(int arg0) {
-				return null;
-			}
-			
-			@Override
-			public void receive(int signalID, SCSData data) {
-				int[] dataArray = Converter.getAsIntArray(data.getData());
-				int normalInt = (dataArray[0] + 1) * (dataArray[1] + 1) - 1;
-				signalStorage.put(signalID, normalInt);
-				receivedData.add(normalInt);
-				System.err.println("Signal: " + signalID + " Received data: "+normalInt);
-			}
-		});
-		dummySCSNode.setStatusListener(new SCSStatusListener() {
-			
-			@Override
-			public void statusChanged(int arg0, SubscriptionStatus arg1) {
-//				System.err.println("status changed: "+arg1);
-			}
-		});
-		dummyAppGateway.start();
-	}
+        dummyAppGateway = SDPFactory.createGatewayServerInstance();
+        dummyAppGateway.init(new SDPNodeEthAddress("localhost", 8126), dummyAppNode);
+        dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode);
+        dummySCSNode.setDataListener(new SCSDataListener() {
 
-	public void subscribe(int signalID) {
-		dummySCSNode.subscribe(signalID);
-	}
-	
-	public boolean getStatus(int signalID){
-		return dummyAppNode.isSubscriber(signalID);
-	}
+            @Override
+            public SCSData request(int arg0) {
+                return null;
+            }
 
-	public int getReceivedValue(int signalID) {
-		return signalStorage.get(signalID);
-	}
-	
-	public LinkedList<Integer> getListOfreceivedValues() {
-		return receivedData;
-	}
-	
-	public void stop() {
-		dummyAppGateway.stop();
-	}
+            @Override
+            public void receive(int signalID, SCSData data) {
+                int[] dataArray = Converter.getAsIntArray(data.getData());
+                int normalInt = (dataArray[0] + 1) * (dataArray[1] + 1) - 1;
+                signalStorage.put(signalID, normalInt);
+                receivedData.add(normalInt);
+                System.err.println("Signal: " + signalID + " Received data: " + normalInt);
+            }
+        });
+        dummySCSNode.setStatusListener(new SCSStatusListener() {
+
+            @Override
+            public void statusChanged(int arg0, SubscriptionStatus arg1) {
+                // System.err.println("status changed: "+arg1);
+            }
+        });
+        dummyAppGateway.start();
+    }
+
+    public void subscribe(int signalID) {
+        dummySCSNode.subscribe(signalID);
+    }
+
+    public boolean getStatus(int signalID) {
+        return dummyAppNode.isSubscriber(signalID);
+    }
+
+    public int getReceivedValue(int signalID) {
+        return signalStorage.get(signalID);
+    }
+
+    public LinkedList<Integer> getListOfreceivedValues() {
+        return receivedData;
+    }
+
+    public void stop() {
+        dummyAppGateway.stop();
+    }
 }
