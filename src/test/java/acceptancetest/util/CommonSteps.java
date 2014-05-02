@@ -17,10 +17,14 @@ public class CommonSteps {
         }
     }
 
-    @Given("^The simulator is setup and running$")
+    @Given("^The simulator is setup$")
     public void setupSimulator() throws Throwable {
         Util.staticSimulator = new Simulator();
-        Util.staticSimulator.init();
+    }
+    
+    @Given("^Add a node on port (\\d+) and ip (.*)$")
+    public void addNode(int port, String ipAdress){
+    	Util.staticSimulator.addAndInitiateNode(ipAdress, port);
     }
 
     @And("^After (\\d+) mSec have passed$")

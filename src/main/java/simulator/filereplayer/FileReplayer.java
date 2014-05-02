@@ -6,7 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
 import simulator.BasicModule;
+
+import com.swedspot.scs.SCS;
 import com.swedspot.scs.data.Uint32;
 
 public class FileReplayer extends BasicModule implements Runnable {
@@ -39,7 +42,8 @@ public class FileReplayer extends BasicModule implements Runnable {
             id = Integer.parseInt(extractData(data[1]));
             if (!providedIDs.contains(id)) {
                 providedIDs.add(id);
-                simulator.getNode().provide(id);
+                for (SCS node : simulator.getNodes())
+                	node.provide(id);
             }
             timestamp = Long.parseLong(extractData(data[0]));
             dataValues.add(new ReplayerDataRow(id, extractData(data[2]),
@@ -90,7 +94,8 @@ public class FileReplayer extends BasicModule implements Runnable {
                 }
                 // TODO are all values going to be integers? Fix if not!
                 data = Integer.parseInt(current.getData());
-                simulator.getNode().send(current.getSignalID(), new Uint32(data));
+                for (SCS node : simulator.getNodes())
+                	node.send(current.getSignalID(), new Uint32(data));
                 // System.err.println("Sent: signalID: "+current.getSignalID() +
                 // ", data: "+current.getData());
                 previousTimestamp = current.getTimestamp();
