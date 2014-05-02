@@ -38,8 +38,7 @@ public class DummyApplication {
 
             @Override
             public void receive(int signalID, SCSData data) {
-                int[] dataArray = Converter.getAsIntArray(data.getData());
-                int normalInt = (dataArray[0] + 1) * (dataArray[1] + 1) - 1;
+                int normalInt = Converter.getAs32BitUnsignedInteger(data.getData());
                 signalStorage.put(signalID, normalInt);
                 receivedData.add(normalInt);
                 System.err.println("Signal: " + signalID + " Received data: " + normalInt);
