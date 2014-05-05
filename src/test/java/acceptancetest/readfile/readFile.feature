@@ -13,7 +13,7 @@ Feature:
     And The simulator reads ExampleData file to replay
     #The ExampleData file contains the signals from the table below
     When The simulator start replaying
-    Then The DummyApp should have received all data for signal 151
+    Then The DummyApp should have received all data
       | TimeStamp | SignalID | Value      |
       | 0         | 151      | 2147483647 |
       | 100       | 151      | 15         |

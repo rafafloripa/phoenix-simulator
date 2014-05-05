@@ -1,7 +1,7 @@
 package acceptancetest.subscribe;
 
-import static org.junit.Assert.assertEquals;
-import acceptancetest.util.DummyApplication;
+import static org.junit.Assert.*;
+import acceptancetest.util.Predicate;
 import acceptancetest.util.Util;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -14,6 +14,7 @@ public class SubscribeSteps {
     @Given("^The simulator is providing (\\d+) with value (\\d+)$")
     public void setupSimulatorSignal(int signalID, int startingValue) throws Throwable {
         Util.staticSimulator.setupSignal(signalID, startingValue);
+        Thread.sleep(1000);
     }
 
     @Given("^DummyApp subscribes for signal (\\d+)$")
@@ -27,7 +28,16 @@ public class SubscribeSteps {
     }
 
     @Then("^DummyApp should get a notification for signal (\\d+) with value (\\d+)$")
-    public void notifyDeveloper(int signalID, int newValue) throws Throwable {
-        assertEquals(newValue, Util.staticDummyApp.getReceivedValue(signalID));
+    public void notifyDeveloper(final int signalID, final int newValue) throws Throwable {
+    	boolean result = Util.WaitFor(new Predicate() {
+			
+			@Override
+			public boolean check() {
+				Integer value = Util.staticDummyApp.getReceivedValue(signalID);
+				System.out.println("comparing "+value +" with "+newValue);
+				return (value != null) && (value.equals(newValue));
+			}
+		}, 8000, 500);
+    	assertTrue("The new value was not received within 8 seconds!", result);
     }
 }

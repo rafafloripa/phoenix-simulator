@@ -1,12 +1,10 @@
 package acceptancetest.readfile;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
 import simulator.filereplayer.FileReplayer;
-import acceptancetest.util.DummyApplication;
 import acceptancetest.util.Predicate;
 import acceptancetest.util.Util;
 import cucumber.api.DataTable;
@@ -18,7 +16,7 @@ public class ReadFileSteps {
 
 	@Given("^The DummyApp has subscribed to signal (\\d+)$")
 	public void setupDummyApp(int signalID1) throws Throwable {
-		Thread.sleep(3000);
+		Thread.sleep(1000);
 		Util.staticDummyApp.subscribe(signalID1);
 	}
 
@@ -52,21 +50,20 @@ public class ReadFileSteps {
 		Thread.sleep(totalTimestamp + 1000);
 	}
 
-	@Then("^The DummyApp should have received all data for signal (\\d+)$")
-	public void receivedSignals(int signalID1, final DataTable table) {
+	@Then("^The DummyApp should have received all data$")
+	public void receivedSignals(final DataTable table) {
 		boolean result = Util.WaitFor(new Predicate() {
 
 			@Override
 			public boolean check() {
-				if (table.raw().size() != Util.staticDummyApp.getListOfreceivedValues().size()) {
+				if (table.raw().size()-1 != Util.staticDummyApp.getListOfreceivedValues().size()) {
 					return false;
 				}
 				for (int i = 1; i < table.raw().size(); i++) {
-					if (Integer.parseInt(table.raw().get(i).get(2)) != (int) Util.staticDummyApp
-							.getListOfreceivedValues().get(i - 1))
-						System.out.println("compared: "+Integer.parseInt(table.raw().get(i).get(2)) +" with "+Util.staticDummyApp
-								.getListOfreceivedValues().get(i - 1));
+					if (Integer.parseInt(table.raw().get(i).get(2)) != (int) Util.staticDummyApp.getListOfreceivedValues().get(i - 1)) {
 						return false;
+					}
+						
 				}
 				return true;
 			}

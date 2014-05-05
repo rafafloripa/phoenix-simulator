@@ -62,7 +62,7 @@ public class DummyApplication {
         return dummyAppNode.isSubscriber(signalID);
     }
 
-    public int getReceivedValue(int signalID) {
+    public Integer getReceivedValue(int signalID) {
         return signalStorage.get(signalID);
     }
 
