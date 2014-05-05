@@ -52,7 +52,7 @@ public class Simulator {
 
 	public void stopSimulation() throws Exception {
 		for (BasicModule module : availableModules)
-			module.startSimulation();
+			module.stopSimulation();
 
 		for (SDPGatewayNode simulatorGateway : simulatorGateways)
 			simulatorGateway.stop();

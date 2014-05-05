@@ -22,12 +22,12 @@ public class DummyApplication {
     HashMap<Integer, Integer> signalStorage = new HashMap<>();
     LinkedList<Integer> receivedData = new LinkedList<>();
 
-    public DummyApplication() throws InterruptedException {
+    public DummyApplication(int portToRunOn) throws InterruptedException {
 
         dummyAppNode = SDPFactory.createNodeInstance();
 
         dummyAppGateway = SDPFactory.createGatewayServerInstance();
-        dummyAppGateway.init(new SDPNodeEthAddress("localhost", 8126), dummyAppNode);
+        dummyAppGateway.init(new SDPNodeEthAddress("localhost", portToRunOn), dummyAppNode);
         dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode);
         dummySCSNode.setDataListener(new SCSDataListener() {
 

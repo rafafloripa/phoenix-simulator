@@ -13,8 +13,10 @@ public class CommonSteps {
         try {
             Util.staticSimulator.stopSimulation();
             Util.staticDummyApp.stop();
+            Thread.sleep(1000);
         } catch (Exception e) {
         }
+        
     }
 
     @Given("^The simulator is setup$")
@@ -22,7 +24,7 @@ public class CommonSteps {
         Util.staticSimulator = new Simulator();
     }
     
-    @Given("^Add a node on port (\\d+) and ip (.*)$")
+    @Given("^Add a node to simulator on port (\\d+) and ip (.*)$")
     public void addNode(int port, String ipAdress){
     	Util.staticSimulator.addAndInitiateNode(ipAdress, port);
     }
@@ -30,5 +32,10 @@ public class CommonSteps {
     @And("^After (\\d+) mSec have passed$")
     public void wait(int timeOut) throws Throwable {
         Thread.sleep(timeOut);
+    }
+    
+    @Given("^The dummy application is setup and listening on port (\\d+)$")
+    public void the_dummy_application_is_setup_and_listening_on_port(int port) throws Throwable {
+        Util.staticDummyApp = new DummyApplication(port);
     }
 }

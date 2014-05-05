@@ -42,8 +42,14 @@ public class FileReplayer extends BasicModule implements Runnable {
             id = Integer.parseInt(extractData(data[1]));
             if (!providedIDs.contains(id)) {
                 providedIDs.add(id);
-                for (SCS node : simulator.getNodes())
+                for (SCS node : simulator.getNodes()){
                 	node.provide(id);
+                	try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+                }
             }
             timestamp = Long.parseLong(extractData(data[0]));
             dataValues.add(new ReplayerDataRow(id, extractData(data[2]),
@@ -96,13 +102,12 @@ public class FileReplayer extends BasicModule implements Runnable {
                 data = Integer.parseInt(current.getData());
                 for (SCS node : simulator.getNodes())
                 	node.send(current.getSignalID(), new Uint32(data));
-                // System.err.println("Sent: signalID: "+current.getSignalID() +
-                // ", data: "+current.getData());
+                 System.err.println("Sent: signalID: "+current.getSignalID() +
+                 ", data: "+current.getData());
                 previousTimestamp = current.getTimestamp();
                 index++;
                 if (index >= dataValues.size()) {
-                    stopSimulation();
-                    break;
+                    return;
                 }
             }
         } catch (InterruptedException e) {

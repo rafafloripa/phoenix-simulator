@@ -18,7 +18,6 @@ public class SubscribeSteps {
 
     @Given("^DummyApp subscribes for signal (\\d+)$")
     public void developerSubscribes(int signalID) throws Throwable {
-        Util.staticDummyApp = new DummyApplication();
         Util.staticDummyApp.subscribe(signalID);
     }
 
