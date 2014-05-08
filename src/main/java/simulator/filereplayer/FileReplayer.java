@@ -140,10 +140,10 @@ public class FileReplayer extends BasicModule implements Runnable {
 	
 	@Override
 	public int hashCode(){
-		int hash = 0;
+		int hash = 1;
 		for(ReplayerDataRow row : dataValues){
 			for(Integer i : providedIDs){
-				hash *= row.getSignalID() * row.getData().hashCode() * i;
+				hash *= 1 + row.getSignalID() * row.getData().hashCode() * i;
 			}
 		}
 		return hash;
