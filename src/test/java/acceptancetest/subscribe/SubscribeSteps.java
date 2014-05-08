@@ -1,6 +1,9 @@
 package acceptancetest.subscribe;
 
 import static org.junit.Assert.*;
+
+import com.swedspot.scs.data.Uint32;
+
 import acceptancetest.util.Predicate;
 import acceptancetest.util.Util;
 import cucumber.api.java.en.Given;
@@ -13,7 +16,8 @@ public class SubscribeSteps {
 
     @Given("^The simulator is providing (\\d+) with value (\\d+)$")
     public void setupSimulatorSignal(int signalID, int startingValue) throws Throwable {
-        Util.staticSimulator.setupSignal(signalID, startingValue);
+        Util.staticSimulator.provideSignal(signalID);
+        Util.staticSimulator.sendValue(signalID, new Uint32(startingValue));
         Thread.sleep(1000);
     }
 
@@ -24,7 +28,7 @@ public class SubscribeSteps {
 
     @When("^The simulator changes the signal (\\d+) to (\\d+)$")
     public void signalChangesValue(int signalID, int newValue) throws Throwable {
-        Util.staticSimulator.changeValue(signalID, newValue);
+        Util.staticSimulator.sendValue(signalID, new Uint32(newValue));
     }
 
     @Then("^DummyApp should get a notification for signal (\\d+) with value (\\d+)$")

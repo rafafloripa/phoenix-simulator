@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 import com.swedspot.scs.SCS;
 import com.swedspot.scs.SCSFactory;
-import com.swedspot.scs.data.Uint32;
+import com.swedspot.scs.data.SCSData;
 import com.swedspot.sdp.SDPFactory;
 import com.swedspot.sdp.observer.SDPGatewayNode;
 import com.swedspot.sdp.observer.SDPNode;
@@ -32,16 +32,27 @@ public class Simulator {
 		nodes.add(SCSFactory.createSCSInstance(tmpNode));
 		simulationState = SimulationState.INITIALIZED;
 	}
+	
+	public void stopAllNodes(){
+		for(SDPGatewayNode node : simulatorGateways){
+			node.stop();
+		}
+		simulatorGateways.removeAll(simulatorGateways);
+	}
 
-	public void setupSignal(int signalID, int startingValue)
-			throws InterruptedException {
+	public void provideSignal(int signalID) {
 		for (SCS node : nodes)
 			node.provide(signalID);
 	}
-
-	public void changeValue(int signalID, int newValue) {
+	
+	public void unprovideSignal(int signalID){
 		for (SCS node : nodes)
-			node.send(signalID, new Uint32(newValue));
+			node.unprovide(signalID);
+	}
+
+	public void sendValue(int signalID, SCSData data) {
+		for (SCS node : nodes)
+			node.send(signalID, data);
 	}
 
 	public void startSimulation() throws Exception {
@@ -72,10 +83,6 @@ public class Simulator {
 		simulationState = SimulationState.RUNNING;
 	}
 
-	public LinkedList<SCS> getNodes() {
-		return nodes;
-	}
-
 	public LinkedList<SDPGatewayNode> getGatewaysNodes() {
 		return simulatorGateways;
 	}
@@ -91,6 +98,10 @@ public class Simulator {
 
 	public void setSimulationState(SimulationState simulationState) {
 		this.simulationState = simulationState;
+	}
+	
+	public void removeModule(BasicModule module){
+		availableModules.remove(module);
 	}
 
 }

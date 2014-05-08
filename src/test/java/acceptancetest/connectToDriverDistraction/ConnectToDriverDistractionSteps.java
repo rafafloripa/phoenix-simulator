@@ -27,12 +27,12 @@ public class ConnectToDriverDistractionSteps {
 	@Given("^The Driver Distraction is setup$")
     public void driverDistractionSetup() throws Throwable {
 		driverDistraction = DriverDistractionImpl.getInstance();
-        Thread.sleep(3000);
+        Thread.sleep(1000);
     }
 	
     @When("^The simulator connects to the driver distraction$")
     public void waitingForConnection() throws Throwable {
-        Thread.sleep(3000);
+        Thread.sleep(1000);
     }
     
     

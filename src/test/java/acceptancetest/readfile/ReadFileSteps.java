@@ -33,7 +33,6 @@ public class ReadFileSteps {
 
 	@When("^The simulator start replaying$")
 	public void the_simulator_start_replaying() throws Throwable {
-		Thread.sleep(1000);
 		Util.staticSimulator.startSimulation();
 	}
 

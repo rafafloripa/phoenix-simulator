@@ -14,6 +14,12 @@ jacoco {
     toolVersion = "0.7.0.201403182114"
 }
 
+jacocoTestReport {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+}
+
 jar {
     manifest {
         attributes 'Implementation-Title': 'MockupSimulator', 'Implementation-Version': version
@@ -88,6 +94,11 @@ task acceptanceTest() {
             args = ['-f', 'pretty', '--monochrome', '--glue', 'acceptancetest', 'src/test/java/acceptancetest']
         }
     }
+}
+
+task copyArtifacts(type: Copy) {
+    from 'build/libs'
+    into '/srv/repo'
 }
 
 pmd {
