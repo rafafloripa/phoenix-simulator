@@ -143,7 +143,7 @@ public class FileReplayer extends BasicModule implements Runnable {
 		int hash = 0;
 		for(ReplayerDataRow row : dataValues){
 			for(Integer i : providedIDs){
-				hash += row.getSignalID() * row.getData().hashCode() * i;
+				hash *= row.getSignalID() * row.getData().hashCode() * i;
 			}
 		}
 		return hash;
