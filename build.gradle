@@ -56,6 +56,10 @@ task downloadVilConfig(type: MyDownload) {
     sourceUrl = 'http://developer.lindholmen.se/repo/VIL-1.0-SNAPSHOT.jar'
     target = file('libs/VIL-1.0-SNAPSHOT.jar')
 }
+task downloadAutomotiveAPI(type: MyDownload) {
+    sourceUrl = 'http://developer.lindholmen.se/repo/Automotive-API-1.0-SNAPSHOT.jar'
+    target = file('libs/Automotive-API-1.0-SNAPSHOT.jar')
+}
 
 class MyDownload extends DefaultTask {
     @Input
@@ -72,6 +76,7 @@ class MyDownload extends DefaultTask {
 
 compileJava.dependsOn downloadSDP
 compileJava.dependsOn downloadVilConfig
+compileJava.dependsOn downloadAutomotiveAPI
 task libsClean(type: Delete) {
     delete 'libs'
 }
