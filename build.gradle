@@ -32,6 +32,7 @@ repositories {
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'com.neuronrobotics:nrjavaserial:3.7.5.1'
     compile 'ch.qos.logback:logback-classic:1.1.2'
 	compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.11'
