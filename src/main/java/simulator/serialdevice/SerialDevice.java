@@ -22,7 +22,7 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 	private boolean isRunning = false;
 	private static final int TIME_OUT = 2000;
 	private static final int DATA_RATE = 9600;
-	private static final int SIGNAL_ID = 216;
+	private static final int SIGNAL_ID = 261;
 
 	public SerialDevice()
 	{
@@ -108,7 +108,7 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 
 	    while (portEnum.hasMoreElements()) {
 	        CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
-	            if (currPortId.getName().startsWith(portname)) {
+	            if (currPortId.getName().equals(portname)) {
 	                portId = currPortId;
 	                break;
 	            }
@@ -122,6 +122,7 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 		        	int data;
 		            if (input.ready()) {
 		                data = Integer.parseInt(input.readLine());
+		                System.out.println(data);
 		                simulator.sendValue(SIGNAL_ID, new Uint16(data));
 		            }
 
