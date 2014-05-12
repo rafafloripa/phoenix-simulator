@@ -64,11 +64,12 @@ public class Simulator {
 	public void stopSimulation() throws Exception {
 		for (BasicModule module : availableModules)
 			module.stopSimulation();
-
+	}
+	
+	public void disconnectSimulator(){
 		for (SDPGatewayNode simulatorGateway : simulatorGateways)
 			simulatorGateway.stop();
 		simulationState = SimulationState.STOPPED;
-
 	}
 
 	public void pauseSimulation() throws Exception {

@@ -12,6 +12,7 @@ public class CommonSteps {
     {
         try {
             Util.staticSimulator.stopSimulation();
+            Util.staticSimulator.disconnectSimulator();
             Util.staticDummyApp.stop();
             Thread.sleep(1000);
         } catch (Exception e) {
