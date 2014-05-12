@@ -22,7 +22,7 @@ jacocoTestReport {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'MockupSimulator', 'Implementation-Version': version
+        attributes 'Implementation-Title': 'Simulator', 'Implementation-Version': version
     }
 }
 

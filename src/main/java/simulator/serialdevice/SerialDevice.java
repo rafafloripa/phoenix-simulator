@@ -50,7 +50,6 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 
 	        serialPort.addEventListener(this);
 	        serialPort.notifyOnDataAvailable(true);
-	        simulator.provideSignal(SIGNAL_ID);
 	        
 	        while (isRunning)
 	        {
@@ -66,6 +65,7 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 	public synchronized void startSimulation() throws Exception {
 		isRunning = true;
 		serialDeviceThread = new Thread(this);
+		simulator.provideSignal(SIGNAL_ID);
 		serialDeviceThread.start();
 	}
 
@@ -77,6 +77,7 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 	        serialPort.close();
 	    }
 	    serialDeviceThread.join();
+	    simulator.unprovideSignal(SIGNAL_ID);
 	}
 
 	@Override
