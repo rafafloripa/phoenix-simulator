@@ -7,6 +7,7 @@
 *.iml
 *.ipr
 *.iws
+libs
 bin
 build
-libs
+reports
