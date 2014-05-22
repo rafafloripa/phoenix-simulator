@@ -51,12 +51,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
-
-
-dependencies {
-
-}
-
 eclipse {
     classpath {
         minusConfigurations += configurations.dll
