@@ -9,7 +9,7 @@ import net.java.games.input.ControllerEnvironment;
 import simulator.BasicModule;
 
 public class GXT27Module extends BasicModule implements Runnable {
-    private final static int STEERING_WHEEL_ID = 514;
+    public final static int STEERING_WHEEL_ID = 514;
     private boolean isRunning = false;
     private boolean isPaused = false;
     private boolean hasChanged = false;

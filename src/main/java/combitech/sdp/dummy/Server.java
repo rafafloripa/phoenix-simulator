@@ -21,6 +21,22 @@ public class Server implements Runnable {
 	public void startServer() {
 		manager = AutomotiveFactory.createAutomotiveManagerInstance(
 				new AutomotiveCertificate(new byte[0]),
+				new AutomotiveListener() {
+                    @Override
+                    public void timeout(int arg0) {
+                        System.out.println("Timeout for: "+arg0);
+                    }
+                    
+                    @Override
+                    public void receive(AutomotiveSignal arg0) {
+                        System.out.println("got: "+arg0.getSignalId()+ "with "+arg0.getData().getDataType());
+                    }
+                    
+                    @Override
+                    public void notAllowed(int arg0) {
+                        System.out.println("Not allowed: "+arg0);
+                    }
+                },
 				new DriverDistractionListener() {
 					@Override
 					public void levelChanged(DriverDistractionLevel level) {
@@ -42,34 +58,25 @@ public class Server implements Runnable {
 
 	@Override
 	public void run() {
-		String cmd = "";
+		String[] cmd = new String[]{};
+		String cmdLine = "";
 		while (isRunning) {
 			System.out.println("Enter command");
-			cmd = System.console().readLine();
-			switch (cmd) {
+			cmdLine = System.console().readLine();
+			cmd = cmdLine.split(" ");
+			switch (cmd[0]) {
 			case "network":
 				System.out.println("command not supported yet");
 				break;
 
 			case "listen":
-				manager.registerListener(new AutomotiveListener() {
-
-					@Override
-					public void timeout(int time) {
-						System.out.println("Timeout: " + time);
-					}
-
-					@Override
-					public void receive(AutomotiveSignal signal) {
-						System.out.println("got signal " + signal.getSignalId()
-								+ " with value " + signal.getData());
-					}
-
-					@Override
-					public void notAllowed(int whatIsThis) {
-						System.out.println("not allowed " + whatIsThis);
-					}
-				}, 257, 258, 259, 260, 261);
+			    for (int i = 1; i < cmd.length; i++) {
+			        try {
+			            manager.register(Integer.parseInt(cmd[i]));
+                    } catch (NumberFormatException e) {
+                        System.out.println("One or more of the parameters are not valid integers: "+cmd[i]);
+                    }
+                }
 				break;
 
 			case "exit":

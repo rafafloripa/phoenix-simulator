@@ -25,11 +25,17 @@ public class CommonSteps {
         Util.staticSimulator = new Simulator();
     }
     
+    @Given("^The simulator is providing signal id (\\d+)$")
+    public void simulatorProvidesSignal(int signalID)
+    {
+        Util.staticSimulator.provideSignal(signalID);
+    }
+    
     @Given("^Add a node to simulator on port (\\d+) and ip (.*)$")
     public void addNode(int port, String ipAdress){
     	Util.staticSimulator.addAndInitiateNode(ipAdress, port);
     }
-
+    
     @And("^After (\\d+) mSec have passed$")
     public void wait(int timeOut) throws Throwable {
         Thread.sleep(timeOut);
@@ -38,5 +44,10 @@ public class CommonSteps {
     @Given("^The dummy application is setup and listening on port (\\d+)$")
     public void the_dummy_application_is_setup_and_listening_on_port(int port) throws Throwable {
         Util.staticDummyApp = new DummyApplication(port);
+    }
+    
+    @Given("^The dummy application subscribes for signal id (\\d+)$")
+    public void dummyAppSubscribe(int signalID){
+        Util.staticDummyApp.subscribe(signalID);
     }
 }
