@@ -1,17 +1,17 @@
 package simulator.serialdevice;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Enumeration;
-
-import com.swedspot.scs.data.Uint16;
-import com.swedspot.scs.data.Uint32;
-
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+
 import simulator.BasicModule;
+
+import com.swedspot.scs.data.Uint16;
 
 
 public class SerialDevice extends BasicModule implements Runnable, SerialPortEventListener {
@@ -22,7 +22,7 @@ public class SerialDevice extends BasicModule implements Runnable, SerialPortEve
 	private boolean isRunning = false;
 	private static final int TIME_OUT = 2000;
 	private static final int DATA_RATE = 9600;
-	private static final int SIGNAL_ID = 261;
+	private static final int SIGNAL_ID = 515;
 
 	public SerialDevice()
 	{

@@ -29,7 +29,7 @@ public class Server implements Runnable {
                     
                     @Override
                     public void receive(AutomotiveSignal arg0) {
-                        System.out.println("got: "+arg0.getSignalId()+ "with "+arg0.getData().getDataType());
+                        System.out.println("got: "+arg0.getSignalId()+ " with "+arg0.getData().getDataType());
                     }
                     
                     @Override

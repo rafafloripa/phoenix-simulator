@@ -1,14 +1,19 @@
 package simulator.steeringwheel.gxt27;
 
-import com.swedspot.scs.data.Uint32;
-
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.DirectAndRawInputEnvironmentPlugin;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import simulator.BasicModule;
 
+import com.swedspot.scs.data.Uint32;
+
 public class GXT27Module extends BasicModule implements Runnable {
+    private final static Logger LOGGER = LoggerFactory.getLogger(GXT27Module.class);
     public final static int STEERING_WHEEL_ID = 514;
     private boolean isRunning = false;
     private boolean isPaused = false;
@@ -23,11 +28,12 @@ public class GXT27Module extends BasicModule implements Runnable {
 
     @Override
     public void run() {
+        initDevice();
         if (controller == null) {
-            System.out.println("Could not find the Trust GXT 27 steering wheel");
+            LOGGER.debug("Could not find the Trust GXT 27 steering wheel");
             return;
         }
-
+        
         while (isRunning) {
             updateControllerModel(controller.poll());
             if (hasChanged) {
@@ -45,17 +51,30 @@ public class GXT27Module extends BasicModule implements Runnable {
 
     }
 
-    private Controller getController() {
-        Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
+    private Controller getController() throws Exception {
+        LOGGER.debug("Looking for controller");
+        System.setProperty("net.java.games.input.librarypath", "C:/Users/Nine/workspace/simulator-gui/libs/natives");
+        DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
+        Controller[] controllers = env.getControllers();
+        LOGGER.debug("Environment found");
         for (Controller cont : controllers) {
-            if (cont.getName().equals("Steering Wheel"))
+            LOGGER.debug("Controller: "+cont.getName());
+            if (cont.getName().equals("Steering Wheel")){
+                LOGGER.debug("Found Controller");
                 return cont;
+            }
         }
+        LOGGER.debug("No controller found");
         return null;
     }
 
     private void initDevice() {
-        controller = getController();
+        try {
+            controller = getController();
+        } catch (Exception e) {
+            LOGGER.debug("Exception with" + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
         model = new ControllerModel();
     }
 
@@ -64,7 +83,7 @@ public class GXT27Module extends BasicModule implements Runnable {
             com = controller.getComponent(Button._0);
             if (com.getPollData() > 0) {
                 model.triangle = true;
-                System.out.println("triangle");
+                LOGGER.debug("triangle");
             } else if (model.triangle) {
                 model.triangle = false;
                 hasChanged = true;
@@ -73,7 +92,7 @@ public class GXT27Module extends BasicModule implements Runnable {
             com = controller.getComponent(Button._1);
             if (com.getPollData() > 0) {
                 model.circle = true;
-                System.out.println("circle");
+                LOGGER.debug("circle");
             } else if (model.circle) {
                 model.circle = false;
                 hasChanged = true;
@@ -82,7 +101,7 @@ public class GXT27Module extends BasicModule implements Runnable {
             com = controller.getComponent(Button._2);
             if (com.getPollData() > 0) {
                 model.cross = true;
-                System.out.println("cross");
+                LOGGER.debug("cross");
             } else if (model.cross) {
                 model.cross = false;
                 hasChanged = true;
@@ -91,7 +110,7 @@ public class GXT27Module extends BasicModule implements Runnable {
             com = controller.getComponent(Button._3);
             if (com.getPollData() > 0) {
                 model.square = true;
-                System.out.println("square");
+                LOGGER.debug("square");
             } else if (model.square) {
                 model.square = false;
                 hasChanged = true;
@@ -101,19 +120,19 @@ public class GXT27Module extends BasicModule implements Runnable {
             if(pollData > 0){
                 if (pollData == 0.25) {
                     model.up = true;
-                    System.out.println("up");
+                    LOGGER.debug("up");
                 } 
                 if (pollData == 0.5) {
                     model.right = true;
-                    System.out.println("right");
+                    LOGGER.debug("right");
                 } 
                 if (pollData == 0.75) {
                     model.down = true;
-                    System.out.println("down");
+                    LOGGER.debug("down");
                 }
                 if (pollData == 1.0) {
                     model.left = true;
-                    System.out.println("left");
+                    LOGGER.debug("left");
                 }
             } else if (model.up) {
                 model.up = false;
@@ -133,19 +152,21 @@ public class GXT27Module extends BasicModule implements Runnable {
 
     @Override
     public void startSimulation() throws Exception {
+        LOGGER.debug("\nStarting the simulation\n");
         isRunning = true;
-        initDevice();
         gxt27InputThread = new Thread(this);
-        gxt27InputThread.start();
         simulator.provideSignal(STEERING_WHEEL_ID);
+        gxt27InputThread.start();
+        LOGGER.debug("\nStarted the simulation\n");
     }
 
     @Override
     public void stopSimulation() throws Exception {
         isRunning = false;
         isPaused = false;
-        gxt27InputThread.join();
         simulator.unprovideSignal(STEERING_WHEEL_ID);
+        gxt27InputThread.join();
+        
     }
 
     @Override
