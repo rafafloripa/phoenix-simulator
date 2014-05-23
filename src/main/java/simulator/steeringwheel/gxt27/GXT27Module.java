@@ -17,7 +17,6 @@ public class GXT27Module extends BasicModule implements Runnable {
     public final static int STEERING_WHEEL_ID = 514;
     private boolean isRunning = false;
     private boolean isPaused = false;
-    private boolean hasChanged = false;
     private Thread gxt27InputThread;
     private Controller controller;
     private ControllerModel model;
@@ -33,13 +32,11 @@ public class GXT27Module extends BasicModule implements Runnable {
             LOGGER.debug("Could not find the Trust GXT 27 steering wheel");
             return;
         }
-        
+
         while (isRunning) {
+            
             updateControllerModel(controller.poll());
-            if (hasChanged) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(model.getFlags()));
-                hasChanged = false;
-            }
+            
             while (isPaused) {
                 try {
                     Thread.sleep(1000);
@@ -58,8 +55,8 @@ public class GXT27Module extends BasicModule implements Runnable {
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
         for (Controller cont : controllers) {
-            LOGGER.debug("Controller: "+cont.getName());
-            if (cont.getName().equals("Steering Wheel")){
+            LOGGER.debug("Controller: " + cont.getName());
+            if (cont.getName().equals("Steering Wheel")) {
                 LOGGER.debug("Found Controller");
                 return cont;
             }
@@ -83,69 +80,69 @@ public class GXT27Module extends BasicModule implements Runnable {
             com = controller.getComponent(Button._0);
             if (com.getPollData() > 0) {
                 model.triangle = true;
-                LOGGER.debug("triangle");
+                // LOGGER.debug("triangle");
             } else if (model.triangle) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
                 model.triangle = false;
-                hasChanged = true;
             }
 
             com = controller.getComponent(Button._1);
             if (com.getPollData() > 0) {
                 model.circle = true;
-                LOGGER.debug("circle");
+                // LOGGER.debug("circle");
             } else if (model.circle) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
                 model.circle = false;
-                hasChanged = true;
             }
 
             com = controller.getComponent(Button._2);
             if (com.getPollData() > 0) {
                 model.cross = true;
-                LOGGER.debug("cross");
+                // LOGGER.debug("cross");
             } else if (model.cross) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
                 model.cross = false;
-                hasChanged = true;
             }
 
             com = controller.getComponent(Button._3);
             if (com.getPollData() > 0) {
                 model.square = true;
-                LOGGER.debug("square");
+                // LOGGER.debug("square");
             } else if (model.square) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
                 model.square = false;
-                hasChanged = true;
             }
             com = controller.getComponent(Component.Identifier.Axis.POV);
             float pollData = com.getPollData();
-            if(pollData > 0){
+            if (pollData > 0) {
                 if (pollData == 0.25) {
                     model.up = true;
-                    LOGGER.debug("up");
-                } 
+                    // LOGGER.debug("up");
+                }
                 if (pollData == 0.5) {
                     model.right = true;
-                    LOGGER.debug("right");
-                } 
+                    // LOGGER.debug("right");
+                }
                 if (pollData == 0.75) {
                     model.down = true;
-                    LOGGER.debug("down");
+                    // LOGGER.debug("down");
                 }
                 if (pollData == 1.0) {
                     model.left = true;
-                    LOGGER.debug("left");
+                    // LOGGER.debug("left");
                 }
             } else if (model.up) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
                 model.up = false;
-                hasChanged = true;
             } else if (model.right) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
                 model.right = false;
-                hasChanged = true;
             } else if (model.down) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
                 model.down = false;
-                hasChanged = true;
             } else if (model.left) {
+                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
                 model.left = false;
-                hasChanged = true;
             }
         }
     }
@@ -166,7 +163,7 @@ public class GXT27Module extends BasicModule implements Runnable {
         isPaused = false;
         simulator.unprovideSignal(STEERING_WHEEL_ID);
         gxt27InputThread.join();
-        
+
     }
 
     @Override
@@ -318,5 +315,6 @@ public class GXT27Module extends BasicModule implements Runnable {
                     (downInt << 6) +
                     (leftInt << 7);
         }
+
     }
 }
