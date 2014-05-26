@@ -102,13 +102,13 @@ public class Server implements Runnable {
 		}
 	}
 
-	private void printWelcomeMessage() {
+	public void printWelcomeMessage() {
 	    System.out.println("\n\n");
 	    System.out.println("Welcome to Combitech's SDP server");
 	    System.out.println("Type help for info on available commands");        
     }
 
-    private void unsubscribe(String[] cmd) {
+    public void unsubscribe(String[] cmd) {
 	    for (int i = 1; i < cmd.length; i++) {
             try {
                 manager.unregister(Integer.parseInt(cmd[i]));
@@ -118,7 +118,7 @@ public class Server implements Runnable {
         }
     }
 	
-	private void subscribe(String[] cmd) {
+	public void subscribe(String[] cmd) {
         for (int i = 1; i < cmd.length; i++) {
             try {
                 manager.register(Integer.parseInt(cmd[i]));
@@ -128,7 +128,7 @@ public class Server implements Runnable {
         }
     }
 
-    private void printHelp() {
+    public void printHelp() {
         String com = "\n\n\t";
         String des = "\t\t";
 	    System.out.print("\nThe commands are:");
@@ -161,7 +161,7 @@ public class Server implements Runnable {
         System.exit(1);
 	}
 
-    private void start() {
+    public void start() {
         serverThread = new Thread(this);
         isRunning = true;
         serverThread.start();        
