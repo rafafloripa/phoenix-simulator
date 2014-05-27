@@ -53,7 +53,7 @@ public class GXT27Module extends BasicModule implements Runnable {
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
-        System.setProperty("net.java.games.input.librarypath", "C:/Users/Nine/workspace/simulator-gui/libs/natives");
+        System.setProperty("net.java.games.input.librarypath", "libs/natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
