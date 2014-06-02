@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.sun.javafx.webkit.UIClientImpl;
 import com.swedspot.automotiveapi.AutomotiveSignalId;
 import com.swedspot.scs.data.SCSFloat;
 import com.swedspot.scs.data.Uint8;
