@@ -25,6 +25,7 @@ public class Server implements Runnable {
 	private boolean isRunning;
 	private volatile HashMap<String, SDPNode> nodeNetwork;
 	private volatile HashMap<Integer, LinkedList<SCSData>> receivedValues;
+
 	final private Lock lock;
 
 	public Server() {
@@ -263,5 +264,9 @@ public class Server implements Runnable {
 			lock.unlock();
 		}
 		return result;
+	}
+
+	public HashMap<Integer, LinkedList<SCSData>> getReceivedValues() {
+		return receivedValues;
 	}
 }
