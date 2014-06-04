@@ -45,7 +45,7 @@ public class Torcs extends BasicModule implements Runnable {
 				extractValues(signalUpdate);
 				simulator.sendValue(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED, new SCSFloat(speed));
 				simulator.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR, new Uint8(currentGear));
-				simulator.sendValue(AutomotiveSignalId.FUEL_LEVEL_1, new SCSFloat(fuelLevel));
+				simulator.sendValue(AutomotiveSignalId.FMS_FUEL_LEVEL_1, new SCSFloat(fuelLevel));
 				Thread.sleep(20);
 			}
 
