@@ -43,8 +43,8 @@ public class Torcs extends BasicModule implements Runnable {
 			while (isStarted && clientSocket.isConnected()) {
 				signalUpdate = inFromTorcs.readLine().trim();
 				extractValues(signalUpdate);
-				simulator.sendValue(AutomotiveSignalId.WHEEL_BASED_SPEED, new SCSFloat(speed));
-				simulator.sendValue(AutomotiveSignalId.CURRENT_GEAR, new Uint8(currentGear));
+				simulator.sendValue(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED, new SCSFloat(speed));
+				simulator.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR, new Uint8(currentGear));
 				simulator.sendValue(AutomotiveSignalId.FUEL_LEVEL_1, new SCSFloat(fuelLevel));
 				Thread.sleep(20);
 			}
@@ -70,9 +70,9 @@ public class Torcs extends BasicModule implements Runnable {
 	public void startSimulation() throws Exception {
 		isStarted = true;
 		torcsThread = new Thread(this);
-		simulator.provideSignal(AutomotiveSignalId.WHEEL_BASED_SPEED);
-		simulator.provideSignal(AutomotiveSignalId.CURRENT_GEAR);
-		simulator.provideSignal(AutomotiveSignalId.FUEL_LEVEL_1);
+		simulator.provideSignal(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED);
+		simulator.provideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
+		simulator.provideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
 		torcsThread.start();
 	}
 
@@ -80,9 +80,9 @@ public class Torcs extends BasicModule implements Runnable {
 	public void stopSimulation() throws Exception {
 		welcomeSocket.close();
 		isStarted = false;
-		simulator.unprovideSignal(AutomotiveSignalId.WHEEL_BASED_SPEED);
-		simulator.unprovideSignal(AutomotiveSignalId.CURRENT_GEAR);
-		simulator.unprovideSignal(AutomotiveSignalId.FUEL_LEVEL_1);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
 		torcsThread.join();
 	}
 
