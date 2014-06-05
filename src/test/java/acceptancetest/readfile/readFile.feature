@@ -11,7 +11,9 @@ Feature:
     And The DummyApp has subscribed to signal 150
     And The DummyApp has subscribed to signal 151
     And The simulator reads ExampleData file to replay
+    
     #The ExampleData file contains the signals from the table below
+    
     When The simulator start replaying
     Then The DummyApp should have received all data
       | TimeStamp | SignalID | Value      |

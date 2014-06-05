@@ -9,6 +9,8 @@ import java.net.Socket;
 import com.sun.javafx.webkit.UIClientImpl;
 import com.swedspot.automotiveapi.AutomotiveSignalId;
 import com.swedspot.scs.data.SCSFloat;
+import com.swedspot.scs.data.SCSShort;
+import com.swedspot.scs.data.Uint16;
 import com.swedspot.scs.data.Uint8;
 
 import simulator.BasicModule;
@@ -19,9 +21,9 @@ public class Torcs extends BasicModule implements Runnable {
 	boolean isStarted = false;
 	int currentGear;
 	float fuelLevel;
+	float fuelConsumption;
 	float speed;
-	
-	final int GEAR_LEVEL_ID = 256;
+	long distance;
 
 	@Override
 	public void run() {
@@ -45,7 +47,7 @@ public class Torcs extends BasicModule implements Runnable {
 				signalUpdate = inFromTorcs.readLine().trim();
 				extractValues(signalUpdate);
 				simulator.sendValue(AutomotiveSignalId.WHEEL_BASED_SPEED, new SCSFloat(speed));
-				simulator.sendValue(AutomotiveSignalId.CURRENT_GEAR, new Uint8(currentGear));
+				simulator.sendValue(AutomotiveSignalId.CURRENT_GEAR, new SCSShort((short)currentGear));
 				simulator.sendValue(AutomotiveSignalId.FUEL_LEVEL_1, new SCSFloat(fuelLevel));
 				Thread.sleep(20);
 			}
@@ -100,15 +102,52 @@ public class Torcs extends BasicModule implements Runnable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		// TODO Auto-generated method stub
-		return false;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + GEAR_LEVEL_ID;
+		result = prime * result + currentGear;
+		result = prime * result + Float.floatToIntBits(fuelLevel);
+		result = prime * result + (isStarted ? 1231 : 1237);
+		result = prime * result + Float.floatToIntBits(speed);
+		result = prime * result
+				+ ((torcsThread == null) ? 0 : torcsThread.hashCode());
+		result = prime * result
+				+ ((welcomeSocket == null) ? 0 : welcomeSocket.hashCode());
+		return result;
 	}
 
 	@Override
-	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Torcs other = (Torcs) obj;
+		if (GEAR_LEVEL_ID != other.GEAR_LEVEL_ID)
+			return false;
+		if (currentGear != other.currentGear)
+			return false;
+		if (Float.floatToIntBits(fuelLevel) != Float
+				.floatToIntBits(other.fuelLevel))
+			return false;
+		if (isStarted != other.isStarted)
+			return false;
+		if (Float.floatToIntBits(speed) != Float.floatToIntBits(other.speed))
+			return false;
+		if (torcsThread == null) {
+			if (other.torcsThread != null)
+				return false;
+		} else if (!torcsThread.equals(other.torcsThread))
+			return false;
+		if (welcomeSocket == null) {
+			if (other.welcomeSocket != null)
+				return false;
+		} else if (!welcomeSocket.equals(other.welcomeSocket))
+			return false;
+		return true;
 	}
 
 }
