@@ -6,11 +6,9 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.sun.javafx.webkit.UIClientImpl;
 import com.swedspot.automotiveapi.AutomotiveSignalId;
 import com.swedspot.scs.data.SCSFloat;
-import com.swedspot.scs.data.SCSShort;
-import com.swedspot.scs.data.Uint16;
+import com.swedspot.scs.data.SCSLong;
 import com.swedspot.scs.data.Uint8;
 
 import simulator.BasicModule;
@@ -46,9 +44,11 @@ public class Torcs extends BasicModule implements Runnable {
 			while (isStarted && clientSocket.isConnected()) {
 				signalUpdate = inFromTorcs.readLine().trim();
 				extractValues(signalUpdate);
-				simulator.sendValue(AutomotiveSignalId.WHEEL_BASED_SPEED, new SCSFloat(speed));
-				simulator.sendValue(AutomotiveSignalId.CURRENT_GEAR, new SCSShort((short)currentGear));
-				simulator.sendValue(AutomotiveSignalId.FUEL_LEVEL_1, new SCSFloat(fuelLevel));
+				simulator.sendValue(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED, new SCSFloat(speed));
+				simulator.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR, new Uint8(currentGear));
+				simulator.sendValue(AutomotiveSignalId.FMS_FUEL_LEVEL_1, new SCSFloat(fuelLevel));
+				simulator.sendValue(AutomotiveSignalId.FMS_FUEL_RATE, new SCSFloat(fuelConsumption));
+				simulator.sendValue(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE, new SCSLong(distance));
 				Thread.sleep(20);
 			}
 
@@ -64,6 +64,8 @@ public class Torcs extends BasicModule implements Runnable {
 		fuelLevel = Float.parseFloat(values[0]);
 		currentGear = Integer.parseInt(values[1]);
 		speed = Float.parseFloat(values[2]);
+		fuelConsumption = Float.parseFloat(values[3]);
+		distance = Long.parseLong(values[4]);
 		} catch(NumberFormatException e){
 			
 		}
@@ -73,9 +75,11 @@ public class Torcs extends BasicModule implements Runnable {
 	public void startSimulation() throws Exception {
 		isStarted = true;
 		torcsThread = new Thread(this);
-		simulator.provideSignal(AutomotiveSignalId.WHEEL_BASED_SPEED);
-		simulator.provideSignal(AutomotiveSignalId.CURRENT_GEAR);
-		simulator.provideSignal(AutomotiveSignalId.FUEL_LEVEL_1);
+		simulator.provideSignal(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED);
+		simulator.provideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
+		simulator.provideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
+		simulator.provideSignal(AutomotiveSignalId.FMS_FUEL_RATE);
+		simulator.provideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 		torcsThread.start();
 	}
 
@@ -83,30 +87,29 @@ public class Torcs extends BasicModule implements Runnable {
 	public void stopSimulation() throws Exception {
 		welcomeSocket.close();
 		isStarted = false;
-		simulator.unprovideSignal(AutomotiveSignalId.WHEEL_BASED_SPEED);
-		simulator.unprovideSignal(AutomotiveSignalId.CURRENT_GEAR);
-		simulator.unprovideSignal(AutomotiveSignalId.FUEL_LEVEL_1);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_RATE);
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 		torcsThread.join();
 	}
 
 	@Override
 	public void pauseSimulation() throws Exception {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void resumeSimulation() throws Exception {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + GEAR_LEVEL_ID;
 		result = prime * result + currentGear;
+		result = prime * result + (int) (distance ^ (distance >>> 32));
+		result = prime * result + Float.floatToIntBits(fuelConsumption);
 		result = prime * result + Float.floatToIntBits(fuelLevel);
 		result = prime * result + (isStarted ? 1231 : 1237);
 		result = prime * result + Float.floatToIntBits(speed);
@@ -126,9 +129,12 @@ public class Torcs extends BasicModule implements Runnable {
 		if (getClass() != obj.getClass())
 			return false;
 		Torcs other = (Torcs) obj;
-		if (GEAR_LEVEL_ID != other.GEAR_LEVEL_ID)
-			return false;
 		if (currentGear != other.currentGear)
+			return false;
+		if (distance != other.distance)
+			return false;
+		if (Float.floatToIntBits(fuelConsumption) != Float
+				.floatToIntBits(other.fuelConsumption))
 			return false;
 		if (Float.floatToIntBits(fuelLevel) != Float
 				.floatToIntBits(other.fuelLevel))
@@ -150,4 +156,5 @@ public class Torcs extends BasicModule implements Runnable {
 		return true;
 	}
 
+	
 }
