@@ -6,10 +6,10 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.swedspot.automotiveapi.AutomotiveSignalId;
-import com.swedspot.scs.data.SCSFloat;
-import com.swedspot.scs.data.SCSLong;
-import com.swedspot.scs.data.Uint8;
+import android.swedspot.automotiveapi.AutomotiveSignalId;
+import android.swedspot.scs.data.SCSFloat;
+import android.swedspot.scs.data.SCSLong;
+import android.swedspot.scs.data.Uint8;
 
 import simulator.BasicModule;
 

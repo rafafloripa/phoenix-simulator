@@ -3,13 +3,13 @@ package simulator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import com.swedspot.scs.SCS;
-import com.swedspot.scs.SCSFactory;
-import com.swedspot.scs.data.SCSData;
-import com.swedspot.sdp.SDPFactory;
-import com.swedspot.sdp.observer.SDPGatewayNode;
-import com.swedspot.sdp.observer.SDPNode;
-import com.swedspot.sdp.routing.SDPNodeEthAddress;
+import android.swedspot.scs.SCS;
+import android.swedspot.scs.SCSFactory;
+import android.swedspot.scs.data.SCSData;
+import android.swedspot.sdp.SDPFactory;
+import android.swedspot.sdp.observer.SDPGatewayNode;
+import android.swedspot.sdp.observer.SDPNode;
+import android.swedspot.sdp.routing.SDPNodeEthAddress;
 
 public class Simulator {
 	private LinkedList<SDPGatewayNode> simulatorGateways;

@@ -9,7 +9,7 @@ import java.util.LinkedList;
 
 import simulator.BasicModule;
 
-import com.swedspot.scs.data.Uint32;
+import android.swedspot.scs.data.Uint32;
 
 public class FileReplayer extends BasicModule implements Runnable {
 

@@ -5,7 +5,7 @@ import simulator.steeringwheel.gxt27.GXT27Module;
 import acceptancetest.util.Predicate;
 import acceptancetest.util.Util;
 
-import com.swedspot.scs.data.Uint32;
+import android.swedspot.scs.data.Uint32;
 
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;

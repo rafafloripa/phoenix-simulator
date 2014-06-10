@@ -10,11 +10,11 @@ import java.util.LinkedList;
 
 import simulator.BasicModule;
 
-import com.swedspot.automotiveapi.AutomotiveSignalId;
-import com.swedspot.scs.data.SCSData;
-import com.swedspot.scs.data.SCSFloat;
-import com.swedspot.scs.data.SCSShort;
-import com.swedspot.scs.data.Uint8;
+import android.swedspot.automotiveapi.AutomotiveSignalId;
+import android.swedspot.scs.data.SCSData;
+import android.swedspot.scs.data.SCSFloat;
+import android.swedspot.scs.data.SCSShort;
+import android.swedspot.scs.data.Uint8;
 
 public class OpenXCReplayer extends BasicModule implements Runnable {
 
@@ -25,6 +25,8 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	private boolean isPaused = false;
 	private Thread storageFileReaderThread;
 
+	private long previousSystemTimestamp;
+	private long currentSystemTimestamp;
 	private long previousTimestamp;
 	private long currentTimestamp;
 	private long timeDiff;
