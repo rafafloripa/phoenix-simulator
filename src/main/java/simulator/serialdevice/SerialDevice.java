@@ -11,7 +11,7 @@ import java.util.Enumeration;
 
 import simulator.BasicModule;
 
-import com.swedspot.scs.data.Uint16;
+import android.swedspot.scs.data.Uint16;
 
 
 public class SerialDevice extends BasicModule implements Runnable, SerialPortEventListener {

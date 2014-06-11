@@ -3,17 +3,17 @@ package acceptancetest.util;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import com.swedspot.scs.SCS;
-import com.swedspot.scs.SCSDataListener;
-import com.swedspot.scs.SCSFactory;
-import com.swedspot.scs.SCSStatusListener;
-import com.swedspot.scs.data.SCSData;
-import com.swedspot.sdp.SDPFactory;
-import com.swedspot.sdp.SubscriptionStatus;
-import com.swedspot.sdp.observer.SDPGatewayNode;
-import com.swedspot.sdp.observer.SDPNode;
-import com.swedspot.sdp.routing.SDPNodeEthAddress;
-import com.swedspot.sdp.util.Converter;
+import android.swedspot.scs.SCS;
+import android.swedspot.scs.SCSDataListener;
+import android.swedspot.scs.SCSFactory;
+import android.swedspot.scs.SCSStatusListener;
+import android.swedspot.scs.data.SCSData;
+import android.swedspot.sdp.SDPFactory;
+import android.swedspot.sdp.SubscriptionStatus;
+import android.swedspot.sdp.observer.SDPGatewayNode;
+import android.swedspot.sdp.observer.SDPNode;
+import android.swedspot.sdp.routing.SDPNodeEthAddress;
+import android.swedspot.sdp.util.Converter;
 
 public class DummyApplication {
     SDPNode dummyAppNode;

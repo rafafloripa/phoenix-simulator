@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import simulator.BasicModule;
 
-import com.swedspot.scs.data.Uint32;
+import android.swedspot.scs.data.Uint32;
 
 public class GXT27Module extends BasicModule implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(GXT27Module.class);

@@ -7,11 +7,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import simulator.BasicModule;
+import android.swedspot.automotiveapi.AutomotiveSignalId;
+import android.swedspot.scs.data.SCSFloat;
+import android.swedspot.scs.data.SCSLong;
+import android.swedspot.scs.data.SCSShort;
+import android.swedspot.scs.data.Uint8;
+import simulator.BasicModule;
 
-import com.swedspot.automotiveapi.AutomotiveSignalId;
-import com.swedspot.scs.data.SCSFloat;
-import com.swedspot.scs.data.SCSLong;
-import com.swedspot.scs.data.SCSShort;
 
 public class Torcs extends BasicModule implements Runnable {
 	ServerSocket welcomeSocket;
