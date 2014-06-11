@@ -6,18 +6,18 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import simulator.BasicModule;
+
 import com.swedspot.automotiveapi.AutomotiveSignalId;
 import com.swedspot.scs.data.SCSFloat;
 import com.swedspot.scs.data.SCSLong;
-import com.swedspot.scs.data.Uint8;
-
-import simulator.BasicModule;
+import com.swedspot.scs.data.SCSShort;
 
 public class Torcs extends BasicModule implements Runnable {
 	ServerSocket welcomeSocket;
 	Thread torcsThread;
 	boolean isStarted = false;
-	int currentGear;
+	short currentGear;
 	float fuelLevel;
 	float fuelConsumption;
 	float speed;
@@ -26,48 +26,57 @@ public class Torcs extends BasicModule implements Runnable {
 	@Override
 	public void run() {
 		String signalUpdate;
-		try {
-			welcomeSocket = new ServerSocket(6000);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Socket clientSocket;
-		try {
-			System.out.println("Awaiting connection");
-			clientSocket = welcomeSocket.accept();
-			System.out.println("Got connection");
-			
-			BufferedReader inFromTorcs = new BufferedReader(
-					new InputStreamReader(clientSocket.getInputStream()));
-			
-			while (isStarted && clientSocket.isConnected()) {
-				signalUpdate = inFromTorcs.readLine().trim();
-				extractValues(signalUpdate);
-				simulator.sendValue(AutomotiveSignalId.FMS_WHEEL_BASED_SPEED, new SCSFloat(speed));
-				simulator.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR, new Uint8(currentGear));
-				simulator.sendValue(AutomotiveSignalId.FMS_FUEL_LEVEL_1, new SCSFloat(fuelLevel));
-				simulator.sendValue(AutomotiveSignalId.FMS_FUEL_RATE, new SCSFloat(fuelConsumption));
-				simulator.sendValue(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE, new SCSLong(distance));
-				Thread.sleep(20);
+		while (true) {
+			try {
+				welcomeSocket = new ServerSocket(6000);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+			Socket clientSocket;
+			try {
+				System.out.println("Awaiting connection");
+				clientSocket = welcomeSocket.accept();
+				System.out.println("Got connection");
 
+				BufferedReader inFromTorcs = new BufferedReader(
+						new InputStreamReader(clientSocket.getInputStream()));
+
+				while (isStarted && clientSocket.isConnected()) {
+					signalUpdate = inFromTorcs.readLine().trim();
+					extractValues(signalUpdate);
+					simulator.sendValue(
+							AutomotiveSignalId.FMS_WHEEL_BASED_SPEED,
+							new SCSFloat(speed));
+					simulator.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR,
+							new SCSShort(currentGear));
+					simulator.sendValue(AutomotiveSignalId.FMS_FUEL_LEVEL_1,
+							new SCSFloat(fuelLevel));
+					simulator.sendValue(AutomotiveSignalId.FMS_FUEL_RATE,
+							new SCSFloat(fuelConsumption));
+					simulator
+							.sendValue(
+									AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE,
+									new SCSLong(distance));
+					Thread.sleep(20);
+				}
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	private void extractValues(String signalUpdate) {
 		String[] values = signalUpdate.replace("FromTorcs ", "").split(";");
-		try{
-		fuelLevel = Float.parseFloat(values[0]);
-		currentGear = Integer.parseInt(values[1]);
-		speed = Float.parseFloat(values[2]);
-		fuelConsumption = Float.parseFloat(values[3]);
-		distance = Long.parseLong(values[4]);
-		} catch(NumberFormatException e){
-			
+		try {
+			fuelLevel = Float.parseFloat(values[0]);
+			currentGear = Short.parseShort(values[1]);
+			speed = Float.parseFloat(values[2]);
+			fuelConsumption = Float.parseFloat(values[3]);
+			distance = Long.parseLong(values[4]);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -79,7 +88,8 @@ public class Torcs extends BasicModule implements Runnable {
 		simulator.provideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
 		simulator.provideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
 		simulator.provideSignal(AutomotiveSignalId.FMS_FUEL_RATE);
-		simulator.provideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
+		simulator
+				.provideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 		torcsThread.start();
 	}
 
@@ -91,7 +101,8 @@ public class Torcs extends BasicModule implements Runnable {
 		simulator.unprovideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
 		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
 		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_RATE);
-		simulator.unprovideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
+		simulator
+				.unprovideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 		torcsThread.join();
 	}
 
@@ -156,5 +167,4 @@ public class Torcs extends BasicModule implements Runnable {
 		return true;
 	}
 
-	
 }
