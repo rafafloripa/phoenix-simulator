@@ -27,6 +27,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 
 	private long previousSystemTimestamp;
 	private long currentSystemTimestamp;
+	private long systemDiff;
 	private long previousTimestamp;
 	private long currentTimestamp;
 	private long timeDiff;
@@ -85,6 +86,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		currentSystemTimestamp = System.currentTimeMillis() / 1000L;
 	}
 
 	@Override
@@ -110,13 +112,14 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 				id = convertNameToID(openXCName);
 				if (availableIDs.contains(id)) {
 					updateTimeDiffs(extractTimestamp(newLine));
-					if (timeDiff > 0 || nanosDiff > 0) {
-						Thread.sleep(timeDiff, nanosDiff);
+					if (timeDiff - systemDiff > 0 || nanosDiff > 0) {
+						Thread.sleep(timeDiff - systemDiff, nanosDiff);
 					}
 
 					SCSData data = convertToSCSData(extractName(newLine),
 							extractValue(newLine));
-					System.out.println("sending id: "+id+" with value: "+extractValue(newLine));
+					System.out.println("sending id: " + id + " with value: "
+							+ extractValue(newLine));
 					simulator.sendValue(id, data);
 				}
 				while (isPaused) {
@@ -131,6 +134,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	private void updateTimeDiffs(String timestamp) {
 		previousNanos = currentNanos;
 		previousTimestamp = currentTimestamp;
+		previousSystemTimestamp = currentSystemTimestamp;
 		if (timestamp.contains(".")) {
 			currentNanos = Integer.parseInt(timestamp.substring(timestamp
 					.indexOf(".") + 2));
@@ -140,9 +144,10 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 			currentNanos = 0;
 			currentTimestamp = Long.parseLong(timestamp);
 		}
-
 		nanosDiff = Math.max(currentNanos - previousNanos, 0);
 		timeDiff = Math.max(currentTimestamp - previousTimestamp, 0);
+		currentSystemTimestamp = System.currentTimeMillis() / 1000L;
+		systemDiff = currentSystemTimestamp - previousSystemTimestamp;
 	}
 
 	private int convertNameToID(String name) {
