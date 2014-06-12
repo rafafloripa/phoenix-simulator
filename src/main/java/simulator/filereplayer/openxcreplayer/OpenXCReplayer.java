@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import simulator.BasicModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import simulator.BasicModule;
 import android.swedspot.automotiveapi.AutomotiveSignalId;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.scs.data.SCSFloat;
@@ -18,9 +20,12 @@ import android.swedspot.scs.data.Uint8;
 
 public class OpenXCReplayer extends BasicModule implements Runnable {
 
+	private final static Logger LOGGER = LoggerFactory
+			.getLogger(OpenXCReplayer.class);
 	private BufferedReader br;
 	private File file;
 	private LinkedList<Integer> availableIDs;
+	private LinkedList<Integer> sendingIDs;
 	private boolean isRunning = false;
 	private boolean isPaused = false;
 	private Thread storageFileReaderThread;
@@ -37,6 +42,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 
 	public OpenXCReplayer() {
 		availableIDs = new LinkedList<>();
+		sendingIDs = new LinkedList<>();
 	}
 
 	public boolean readFile(File file) throws IOException {
@@ -48,6 +54,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 			id = convertNameToID(extractName(newLine));
 			if (!availableIDs.contains(id) && id != -1) {
 				availableIDs.add(id);
+				sendingIDs.add(id);
 			}
 		}
 		br.close();
@@ -56,6 +63,9 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 
 	@Override
 	public void startSimulation() {
+		for (int id : sendingIDs) {
+			simulator.provideSignal(id);
+		}
 		if (!availableIDs.isEmpty()) {
 			try {
 				br = new BufferedReader(new FileReader(file));
@@ -91,6 +101,9 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 
 	@Override
 	public void stopSimulation() {
+		for (int id : sendingIDs) {
+			simulator.unprovideSignal(id);
+		}
 		isRunning = false;
 		try {
 			storageFileReaderThread.join();
@@ -110,7 +123,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 				newLine = newLine.trim();
 				openXCName = extractName(newLine);
 				id = convertNameToID(openXCName);
-				if (availableIDs.contains(id)) {
+				if (sendingIDs.contains(id)) {
 					updateTimeDiffs(extractTimestamp(newLine));
 					if (timeDiff - systemDiff > 0 || nanosDiff > 0) {
 						Thread.sleep(timeDiff - systemDiff, nanosDiff);
@@ -128,6 +141,9 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 			}
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
+		}
+		for (int sentId : sendingIDs) {
+			simulator.unprovideSignal(sentId);
 		}
 	}
 
@@ -255,7 +271,8 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	public int[] getAvailableIDs() {
 		int[] tmp = new int[availableIDs.size()];
 		for (int i = 0; i < tmp.length; i++) {
-			tmp[i] = availableIDs.get(i);
+			tmp[i] = availableIDs.get(i).intValue();
+			LOGGER.debug("returning: " + tmp[i]);
 		}
 		return tmp;
 	}
@@ -279,5 +296,13 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 			hash *= (10 + i);
 		}
 		return hash;
+	}
+
+	public void setSendingsignals(int[] id) {
+		LinkedList<Integer> tmp = new LinkedList<>();
+		for (int i = 0; i < id.length; i++) {
+			tmp.add(id[i]);
+		}
+		sendingIDs = tmp;
 	}
 }

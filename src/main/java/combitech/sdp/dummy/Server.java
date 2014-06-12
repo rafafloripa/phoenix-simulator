@@ -45,10 +45,10 @@ public class Server implements Runnable {
 
 					@Override
 					public void receive(AutomotiveSignal signal) {
+						System.out.println("got: " + signal.getSignalId()
+								+ " as a " + signal.getData().getDataType());
 						lock.lock();
 						try {
-							System.out.println("got: " + signal.getSignalId()
-									+ " as a " + signal.getData().getDataType());
 							LinkedList<SCSData> data = receivedValues
 									.get(signal.getSignalId());
 							if (data == null) {
