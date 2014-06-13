@@ -75,5 +75,6 @@ public class DummyApplication {
         for (int i = 0; i < dummyAppGateway.connections().size(); i++) {
         	dummyAppGateway.disconnect(dummyAppGateway.connections().iterator().next());
 		}
+        dummyAppGateway = null;
     }
 }
