@@ -1,7 +1,9 @@
 package simulator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSFactory;
@@ -12,14 +14,18 @@ import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
 
 public class Simulator {
+	private HashMap<Integer, Integer> provideMap;
 	private LinkedList<SDPGatewayNode> simulatorGateways;
 	private LinkedList<SCS> nodes;
 	private ArrayList<BasicModule> availableModules = new ArrayList<BasicModule>();
 	private SimulationState simulationState = SimulationState.STOPPED;
+	private ReentrantLock lock;
 
 	public Simulator() {
 		simulatorGateways = new LinkedList<>();
 		nodes = new LinkedList<>();
+		provideMap = new HashMap<>();
+		lock = new ReentrantLock();
 	}
 
 	/**
@@ -57,8 +63,21 @@ public class Simulator {
 	 * @param signalID
 	 */
 	public void provideSignal(int signalID) {
-		for (SCS node : nodes)
-			node.provide(signalID);
+		lock.lock();
+		try {
+			Integer tmp = provideMap.get(signalID);
+			if (tmp == null) {
+				tmp = new Integer(1);
+				provideMap.put(signalID, 1);
+				for (SCS node : nodes)
+					node.provide(signalID);
+			} else {
+				provideMap.remove(signalID);
+				provideMap.put(signalID, (tmp + 1));
+			}
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	/**
@@ -67,8 +86,25 @@ public class Simulator {
 	 * @param signalID
 	 */
 	public void unprovideSignal(int signalID) {
-		for (SCS node : nodes)
-			node.unprovide(signalID);
+		lock.lock();
+		try {
+			Integer tmp = provideMap.get(signalID);
+			if (tmp != null) {
+				if (tmp <= 0) {
+				} else if (tmp == 1) {
+					for (SCS node : nodes)
+						node.unprovide(signalID);
+					provideMap.remove(signalID);
+					provideMap.put(signalID, 0);
+					tmp--;
+				} else {
+					provideMap.remove(signalID);
+					provideMap.put(signalID, (tmp - 1));
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	/**
