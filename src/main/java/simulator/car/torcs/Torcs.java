@@ -35,7 +35,8 @@ public class Torcs extends BasicModule {
 				AutomotiveSignalId.FMS_WHEEL_BASED_SPEED, 
 				AutomotiveSignalId.FMS_CURRENT_GEAR, 
 				AutomotiveSignalId.FMS_FUEL_LEVEL_1, 
-				AutomotiveSignalId.FMS_FUEL_RATE};
+				AutomotiveSignalId.FMS_FUEL_RATE,
+				AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE}; 
 	}
 	
 	@Override
@@ -73,7 +74,7 @@ public class Torcs extends BasicModule {
 							.sendValue(
 									AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE,
 									new SCSLong(distance));
-					Thread.sleep(20);
+					Thread.sleep(30);
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();

@@ -79,7 +79,7 @@ public class SerialDevice extends BasicModule implements
 	}
 
 	public void initializeDevice(String portname) {
-		Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
+		Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
 
 		while (portEnum.hasMoreElements()) {
 			CommPortIdentifier currPortId = (CommPortIdentifier) portEnum
