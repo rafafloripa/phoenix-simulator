@@ -1,6 +1,6 @@
 package acceptancetest.util;
 
-import simulator.Simulator;
+import simulator.SimulatorGateway;
 import cucumber.api.java.After;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -11,7 +11,6 @@ public class CommonSteps {
     public void shutdownNodeStep()
     {
         try {
-            Util.staticSimulator.stopSimulation();
             Util.staticSimulator.disconnectSimulator();
             Util.staticDummyApp.stop();
             Thread.sleep(1000);
@@ -22,7 +21,7 @@ public class CommonSteps {
 
     @Given("^The simulator is setup$")
     public void setupSimulator() throws Throwable {
-        Util.staticSimulator = new Simulator();
+        Util.staticSimulator = new SimulatorGateway();
     }
     
     @Given("^The simulator is providing signal id (\\d+)$")

@@ -1,24 +1,26 @@
 package simulator.filereplayer.openxcreplayer;
 
+import static simulator.SimulationModuleState.RUNNING;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import simulator.BasicModule;
+import simulator.SimulatorGateway;
 import android.swedspot.automotiveapi.AutomotiveSignalId;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.scs.data.SCSFloat;
 import android.swedspot.scs.data.SCSShort;
 import android.swedspot.scs.data.Uint8;
 
-public class OpenXCReplayer extends BasicModule implements Runnable {
+public class OpenXCReplayer extends BasicModule {
 
 	private final static Logger LOGGER = LoggerFactory
 			.getLogger(OpenXCReplayer.class);
@@ -26,9 +28,6 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	private File file;
 	private LinkedList<Integer> availableIDs;
 	private LinkedList<Integer> sendingIDs;
-	private boolean isRunning = false;
-	private boolean isPaused = false;
-	private Thread storageFileReaderThread;
 
 	private long previousSystemTimestamp;
 	private long currentSystemTimestamp;
@@ -40,7 +39,8 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	private int currentNanos;
 	private int nanosDiff;
 
-	public OpenXCReplayer() {
+	public OpenXCReplayer(SimulatorGateway gateway) {
+		super(gateway);
 		availableIDs = new LinkedList<>();
 		sendingIDs = new LinkedList<>();
 	}
@@ -62,10 +62,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	}
 
 	@Override
-	public void startSimulation() {
-		for (int id : sendingIDs) {
-			simulator.provideSignal(id);
-		}
+	public void startModule() {
 		if (!availableIDs.isEmpty()) {
 			try {
 				br = new BufferedReader(new FileReader(file));
@@ -73,10 +70,8 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 				e.printStackTrace();
 			}
 			setFirstTimestamp();
-			isRunning = true;
-			storageFileReaderThread = new Thread(this);
-			storageFileReaderThread.start();
 		}
+		super.startModule();
 	}
 
 	private void setFirstTimestamp() {
@@ -100,17 +95,13 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 	}
 
 	@Override
-	public void stopSimulation() {
-		for (int id : sendingIDs) {
-			simulator.unprovideSignal(id);
-		}
-		isRunning = false;
+	public void stopModule() {
 		try {
-			storageFileReaderThread.join();
 			br.close();
-		} catch (InterruptedException | IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		super.stopModule();
 	}
 
 	@Override
@@ -119,7 +110,7 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 		String openXCName = "";
 		int id;
 		try {
-			while (isRunning && (newLine = br.readLine()) != null) {
+			while (state == RUNNING && (newLine = br.readLine()) != null) {
 				newLine = newLine.trim();
 				openXCName = extractName(newLine);
 				id = convertNameToID(openXCName);
@@ -133,17 +124,14 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 							extractValue(newLine));
 					System.out.println("sending id: " + id + " with value: "
 							+ extractValue(newLine));
-					simulator.sendValue(id, data);
-				}
-				while (isPaused) {
-					Thread.sleep(1000);
+					gateway.sendValue(id, data);
 				}
 			}
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 		}
 		for (int sentId : sendingIDs) {
-			simulator.unprovideSignal(sentId);
+			gateway.unprovideSignal(sentId);
 		}
 	}
 
@@ -258,16 +246,6 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 		return replacedString.substring(pointOfIntrest, endpoint);
 	}
 
-	@Override
-	public void pauseSimulation() throws Exception {
-		isPaused = true;
-	}
-
-	@Override
-	public void resumeSimulation() throws Exception {
-		isPaused = false;
-	}
-
 	public int[] getAvailableIDs() {
 		int[] tmp = new int[availableIDs.size()];
 		for (int i = 0; i < tmp.length; i++) {
@@ -277,32 +255,20 @@ public class OpenXCReplayer extends BasicModule implements Runnable {
 		return tmp;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o instanceof File) {
-			OpenXCReplayer tmp = (OpenXCReplayer) o;
-			return Arrays.equals(getAvailableIDs(), tmp.getAvailableIDs());
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		int hash = 1;
-		for (Integer i : availableIDs) {
-			hash *= (10 + i);
-		}
-		return hash;
-	}
-
 	public void setSendingsignals(int[] id) {
 		LinkedList<Integer> tmp = new LinkedList<>();
 		for (int i = 0; i < id.length; i++) {
 			tmp.add(id[i]);
 		}
 		sendingIDs = tmp;
+	}
+
+	@Override
+	public int[] getProvidingSingals() {
+		int[] tmp = new int[sendingIDs.size()];
+		for (int i = 0; i < sendingIDs.size(); i++) {
+			tmp[i] = sendingIDs.get(i);
+		}
+		return null;
 	}
 }
