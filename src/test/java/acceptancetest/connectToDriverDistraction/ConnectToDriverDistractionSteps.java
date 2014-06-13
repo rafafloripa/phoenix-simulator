@@ -39,7 +39,7 @@ public class ConnectToDriverDistractionSteps {
 
     @Then("^The connection should be accepted$")
     public void connectionExists() throws Throwable {
-        assertTrue(Util.staticSimulator.getGatewaysNodes().size()>1);
-        assertTrue(Util.staticSimulator.getGatewaysNodes().get(1).connections().size()>0);
+        assertTrue(Util.staticSimulator.getGatewaysNodes().size()>0);
+        assertTrue(Util.staticSimulator.getGatewaysNodes().get(0).connections().size()>0);
     }
 }
