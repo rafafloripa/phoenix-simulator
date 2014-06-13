@@ -269,6 +269,6 @@ public class OpenXCReplayer extends BasicModule {
 		for (int i = 0; i < sendingIDs.size(); i++) {
 			tmp[i] = sendingIDs.get(i);
 		}
-		return null;
+		return tmp;
 	}
 }
