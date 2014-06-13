@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 import simulator.Simulator;
 import simulator.car.torcs.Torcs;
 
