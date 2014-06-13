@@ -1,4 +1,4 @@
-Feature: 
+Feature: subscribing for a signal
   As a developer
   I want to subscribe for a specific signal
   So that I can use it in my application

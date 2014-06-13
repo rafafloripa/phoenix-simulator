@@ -1,11 +1,11 @@
 package acceptancetest.connectToDriverDistraction;
 
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import acceptancetest.util.Util;
 
 import com.swedspot.vil.distraction.DriverDistraction;
 import com.swedspot.vil.distraction.impl.DriverDistractionImpl;
 
-import acceptancetest.util.Util;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -39,6 +39,7 @@ public class ConnectToDriverDistractionSteps {
 
     @Then("^The connection should be accepted$")
     public void connectionExists() throws Throwable {
-        assertNotEquals(0, Util.staticSimulator.getGatewaysNodes().get(1).connections().size());
+        assertTrue(Util.staticSimulator.getGatewaysNodes().size()>0);
+        assertTrue(Util.staticSimulator.getGatewaysNodes().get(0).connections().size()>0);
     }
 }

@@ -1,10 +1,10 @@
-Feature: 
+Feature: reading a data file and sending the data
   As a developer
   I want the simulator to read data files with signal data and time stamps
   So that I can get simulated values for my application
 
   @shutdownNode
-  Scenario: reading an data file and sending the data
+  Scenario: reading a data file and sending the data
     Given The dummy application is setup and listening on port 8126
     And The simulator is setup
     And Add a node to simulator on port 8126 and ip localhost

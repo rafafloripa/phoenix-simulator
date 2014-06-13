@@ -62,7 +62,6 @@ public class Torcs extends BasicModule implements Runnable {
 									new SCSLong(distance));
 					Thread.sleep(20);
 				}
-
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -103,9 +102,7 @@ public class Torcs extends BasicModule implements Runnable {
 		simulator.unprovideSignal(AutomotiveSignalId.FMS_CURRENT_GEAR);
 		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_LEVEL_1);
 		simulator.unprovideSignal(AutomotiveSignalId.FMS_FUEL_RATE);
-		simulator
-				.unprovideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
-		torcsThread.join();
+		simulator.unprovideSignal(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE);
 	}
 
 	@Override

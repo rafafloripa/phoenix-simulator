@@ -42,19 +42,11 @@ public class Simulator {
 				.createGatewayClientInstance();
 		simulatorGateway.init(new SDPNodeEthAddress(adress, port), tmpNode);
 		simulatorGateway.start();
-		try {
-			Thread.sleep(25);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		if (!simulatorGateway.connections().isEmpty()) {
-			simulatorGateways.add(simulatorGateway);
-			nodes.add(SCSFactory.createSCSInstance(tmpNode));
-			simulationState = SimulationState.INITIALIZED;
-			return true;
-		}
-		simulatorGateway.stop();
-		return false;
+		
+		simulatorGateways.add(simulatorGateway);
+		nodes.add(SCSFactory.createSCSInstance(tmpNode));
+		simulationState = SimulationState.INITIALIZED;
+		return true;
 	}
 
 	/**
