@@ -1,11 +1,11 @@
 package acceptancetest.connectToDriverDistraction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import acceptancetest.util.Util;
 
 import com.swedspot.vil.distraction.DriverDistraction;
 import com.swedspot.vil.distraction.impl.DriverDistractionImpl;
 
-import acceptancetest.util.Util;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;

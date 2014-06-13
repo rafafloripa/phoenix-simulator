@@ -8,8 +8,6 @@ so that I can implement my own components to talk to the SDK
     And After 2000 mSec have passed
     And The Driver Distraction is setup
     And After 2000 mSec have passed
-    And Add a node to simulator on port 8126 and ip localhost
-    And After 2000 mSec have passed
     And Add a node to simulator on port 9898 and ip localhost
     And After 2000 mSec have passed
     When The simulator connects to the driver distraction
