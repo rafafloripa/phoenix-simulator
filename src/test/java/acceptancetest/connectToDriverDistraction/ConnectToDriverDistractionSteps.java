@@ -1,6 +1,6 @@
 package acceptancetest.connectToDriverDistraction;
 
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 import com.swedspot.vil.distraction.DriverDistraction;
 import com.swedspot.vil.distraction.impl.DriverDistractionImpl;
@@ -39,6 +39,7 @@ public class ConnectToDriverDistractionSteps {
 
     @Then("^The connection should be accepted$")
     public void connectionExists() throws Throwable {
-        assertNotEquals(0, Util.staticSimulator.getGatewaysNodes().get(1).connections().size());
+        assertTrue(Util.staticSimulator.getGatewaysNodes().size()>1);
+        assertTrue(Util.staticSimulator.getGatewaysNodes().get(1).connections().size()>0);
     }
 }
