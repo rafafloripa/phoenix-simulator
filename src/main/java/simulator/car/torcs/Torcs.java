@@ -28,6 +28,8 @@ public class Torcs extends BasicModule {
 	float fuelConsumption;
 	float speed;
 	long distance;
+    private float engineSpeed;
+    private float acceleratorPedalPosition;
 
 	@Override
 	public int[] getProvidingSingals() {
@@ -36,7 +38,9 @@ public class Torcs extends BasicModule {
 				AutomotiveSignalId.FMS_CURRENT_GEAR, 
 				AutomotiveSignalId.FMS_FUEL_LEVEL_1, 
 				AutomotiveSignalId.FMS_FUEL_RATE,
-				AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE}; 
+				AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE,
+				AutomotiveSignalId.FMS_ENGINE_SPEED,
+				AutomotiveSignalId.FMS_ACCELERATOR_PEDAL_POSITION_1}; 
 	}
 	
 	@Override
@@ -70,10 +74,13 @@ public class Torcs extends BasicModule {
 							new SCSFloat(fuelLevel));
 					gateway.sendValue(AutomotiveSignalId.FMS_FUEL_RATE,
 							new SCSFloat(fuelConsumption));
-					gateway
-							.sendValue(
-									AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE,
-									new SCSLong(distance));
+					gateway.sendValue(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE,
+							new SCSLong(distance));
+					gateway.sendValue(AutomotiveSignalId.FMS_ENGINE_SPEED, 
+					        new SCSFloat(engineSpeed));
+					gateway.sendValue(AutomotiveSignalId.FMS_ACCELERATOR_PEDAL_POSITION_1, 
+					        new SCSFloat(acceleratorPedalPosition));
+					
 					Thread.sleep(30);
 				}
 			} catch (Exception e1) {
@@ -90,6 +97,8 @@ public class Torcs extends BasicModule {
 			speed = Float.parseFloat(values[2]);
 			fuelConsumption = Float.parseFloat(values[3]);
 			distance = Long.parseLong(values[4]);
+			engineSpeed = Float.parseFloat(values[5]);
+			acceleratorPedalPosition = Float.parseFloat(values[6]);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
