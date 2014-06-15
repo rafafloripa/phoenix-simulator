@@ -42,7 +42,7 @@ public class Torcs extends BasicModule {
 	@Override
 	public void run() {
 		String signalUpdate;
-		while (true) {
+        while (state == RUNNING) {
 			try {
 				welcomeSocket = new ServerSocket(6000);
 			} catch (IOException e) {

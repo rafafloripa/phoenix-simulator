@@ -34,6 +34,12 @@ public class SimulatorGateway {
 
 		simulatorGateways.add(simulatorGateway);
 		nodes.add(SCSFactory.createSCSInstance(tmpNode));
+	      try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 		return true;
 	}
 
