@@ -54,7 +54,6 @@ public class OpenXCReplayer extends BasicModule {
 			id = convertNameToID(extractName(newLine));
 			if (!availableIDs.contains(id) && id != -1) {
 				availableIDs.add(id);
-				sendingIDs.add(id);
 			}
 		}
 		br.close();
