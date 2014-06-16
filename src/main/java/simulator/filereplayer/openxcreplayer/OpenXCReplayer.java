@@ -22,8 +22,7 @@ import android.swedspot.scs.data.Uint8;
 
 public class OpenXCReplayer extends BasicModule {
 
-	private final static Logger LOGGER = LoggerFactory
-			.getLogger(OpenXCReplayer.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(OpenXCReplayer.class);
 	private BufferedReader br;
 	private File file;
 	private LinkedList<Integer> availableIDs;
@@ -78,10 +77,8 @@ public class OpenXCReplayer extends BasicModule {
 			br.mark(180);
 			String timestamp = extractTimestamp(br.readLine());
 			if (timestamp.contains(".")) {
-				currentNanos = Integer.parseInt(timestamp.substring(timestamp
-						.indexOf(".") + 2));
-				currentTimestamp = Long.parseLong(timestamp.substring(0,
-						timestamp.indexOf(".")));
+				currentNanos = Integer.parseInt(timestamp.substring(timestamp.indexOf(".") + 2));
+				currentTimestamp = Long.parseLong(timestamp.substring(0, timestamp.indexOf(".")));
 			} else {
 				currentNanos = 0;
 				currentTimestamp = Long.parseLong(timestamp);
@@ -119,10 +116,8 @@ public class OpenXCReplayer extends BasicModule {
 						Thread.sleep(timeDiff - systemDiff, nanosDiff);
 					}
 
-					SCSData data = convertToSCSData(extractName(newLine),
-							extractValue(newLine));
-					System.out.println("sending id: " + id + " with value: "
-							+ extractValue(newLine));
+					SCSData data = convertToSCSData(extractName(newLine), extractValue(newLine));
+					System.out.println("sending id: " + id + " with value: " + extractValue(newLine));
 					gateway.sendValue(id, data);
 				}
 			}
@@ -139,10 +134,8 @@ public class OpenXCReplayer extends BasicModule {
 		previousTimestamp = currentTimestamp;
 		previousSystemTimestamp = currentSystemTimestamp;
 		if (timestamp.contains(".")) {
-			currentNanos = Integer.parseInt(timestamp.substring(timestamp
-					.indexOf(".") + 2));
-			currentTimestamp = Long.parseLong(timestamp.substring(0,
-					timestamp.indexOf(".")));
+			currentNanos = Integer.parseInt(timestamp.substring(timestamp.indexOf(".") + 2));
+			currentTimestamp = Long.parseLong(timestamp.substring(0, timestamp.indexOf(".")));
 		} else {
 			currentNanos = 0;
 			currentTimestamp = Long.parseLong(timestamp);
@@ -195,6 +188,8 @@ public class OpenXCReplayer extends BasicModule {
 				return new SCSShort((short) -1);
 			case "neutral":
 				return new SCSShort((short) 0);
+			case "parking":
+				return new SCSShort((short) 251);
 			}
 
 		case "vehicle_speed":
