@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class OpenXCReplayerTest {
 	@Test
 	public void test__String__String(){
-		OpenXCReplayer replayer = new OpenXCReplayer();
+		OpenXCReplayer replayer = new OpenXCReplayer(null);
 		String inputString1 = "{\"timestamp\": 1351181673.6880012, \"name\": \"vehicle_speed\", \"value\": 0.0}";
 		String inputString2 = "{\"name\": \"vehicle_speed\",\"timestamp\": 1351181673.6880012, \"value\": 0.0}";
 		

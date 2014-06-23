@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import simulator.BasicModule;
-
+import simulator.SimulatorGateway;
 import android.swedspot.scs.data.Uint32;
+import static simulator.SimulationModuleState.*;
 
-public class FileReplayer extends BasicModule implements Runnable {
+public class FileReplayer extends BasicModule {
 
 	private BufferedReader br;
 	private ArrayList<ReplayerDataRow> dataValues;
@@ -19,12 +20,11 @@ public class FileReplayer extends BasicModule implements Runnable {
 	private int index;
 	private long timeDiff;
 	private long previousTimestamp;
-	private boolean isRunning = false;
 	private ReplayerDataRow current;
 	private int data;
-	private Thread storageFileReaderThread;
 
-	public FileReplayer() {
+	public FileReplayer(SimulatorGateway gateway) {
+		super(gateway);
 		dataValues = new ArrayList<>();
 		providedIDs = new LinkedList<>();
 	}
@@ -41,7 +41,7 @@ public class FileReplayer extends BasicModule implements Runnable {
 			id = Integer.parseInt(extractData(data[1]));
 			if (!providedIDs.contains(id)) {
 				providedIDs.add(id);
-				simulator.provideSignal(id);
+				gateway.provideSignal(id);
 			}
 			timestamp = Long.parseLong(extractData(data[0]));
 			dataValues.add(new ReplayerDataRow(id, extractData(data[2]),
@@ -58,31 +58,24 @@ public class FileReplayer extends BasicModule implements Runnable {
 	}
 
 	@Override
-	public void startSimulation() {
+	public void startModule() {
+		super.startModule();
 		if (!dataValues.isEmpty()) {
 			index = 0;
 			previousTimestamp = dataValues.get(0).getTimestamp();
-			isRunning = true;
-			storageFileReaderThread = new Thread(this);
-			storageFileReaderThread.start();
 		}
 	}
 
 	@Override
-	public void stopSimulation() {
-		isRunning = false;
+	public void stopModule() {
+		super.stopModule();
 		index = 0;
-		try {
-			storageFileReaderThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	public void run() {
 		try {
-			while (isRunning) {
+			while (state == RUNNING) {
 				current = dataValues.get(index);
 				timeDiff = current.getTimestamp() - previousTimestamp;
 				if (timeDiff > 0) {
@@ -92,7 +85,7 @@ public class FileReplayer extends BasicModule implements Runnable {
 				}
 				// TODO are all values going to be integers? Fix if not!
 				data = Integer.parseInt(current.getData());
-				simulator.sendValue(current.getSignalID(), new Uint32(data));
+				gateway.sendValue(current.getSignalID(), new Uint32(data));
 				System.err.println("Sent: signalID: " + current.getSignalID()
 						+ ", data: " + current.getData());
 				previousTimestamp = current.getTimestamp();
@@ -106,18 +99,6 @@ public class FileReplayer extends BasicModule implements Runnable {
 		}
 	}
 
-	@Override
-	public void pauseSimulation() throws Exception {
-		throw new Exception("Pause is not supported");
-
-	}
-
-	@Override
-	public void resumeSimulation() throws Exception {
-		throw new Exception("Resume is not supported");
-
-	}
-
 	public ArrayList<ReplayerDataRow> getDataValues() {
 		return dataValues;
 	}
@@ -127,25 +108,12 @@ public class FileReplayer extends BasicModule implements Runnable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
+	public int[] getProvidingSingals() {
+		int[] tmp = new int[providedIDs.size()];
+		for (int i = 0; i < providedIDs.size(); i++) {
+			tmp[i] = providedIDs.get(i);
 		}
-		if (o instanceof File) {
-			FileReplayer tmp = (FileReplayer) o;
-			return dataValues.equals(tmp.getDataValues()) && providedIDs.equals(tmp.getProvidedIDs());
-		}
-		return false;
+		return tmp;
 	}
-	
-	@Override
-	public int hashCode(){
-		int hash = 1;
-		for(ReplayerDataRow row : dataValues){
-			for(Integer i : providedIDs){
-				hash *= 1 + row.getSignalID() * row.getData().hashCode() * i;
-			}
-		}
-		return hash;
-	}
+
 }

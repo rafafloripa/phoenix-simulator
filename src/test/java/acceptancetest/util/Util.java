@@ -1,10 +1,12 @@
 package acceptancetest.util;
 
-import simulator.Simulator;
+import simulator.BasicModule;
+import simulator.SimulatorGateway;
 
 public class Util {
     public static DummyApplication staticDummyApp;
-    public static Simulator staticSimulator;
+    public static SimulatorGateway staticSimulator;
+	public static BasicModule staticModule;
     
     public static boolean WaitFor(Predicate condition ,int timeoutInMiliSec, int retryIntervalInMilisec)
     {

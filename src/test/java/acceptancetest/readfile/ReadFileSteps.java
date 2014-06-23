@@ -26,14 +26,13 @@ public class ReadFileSteps {
 		System.err.println(new java.io.File(".").getCanonicalPath());
 		File exampleData = new File("testResources/ExampleData");
 		assertTrue(exampleData.exists());
-		FileReplayer reader = new FileReplayer();
-		Util.staticSimulator.addSimulationModule(reader);
-		assertTrue(reader.readFile(exampleData));
+		Util.staticModule = new FileReplayer(Util.staticSimulator);
+		assertTrue(((FileReplayer)Util.staticModule).readFile(exampleData));
 	}
 
 	@When("^The simulator start replaying$")
 	public void the_simulator_start_replaying() throws Throwable {
-		Util.staticSimulator.startSimulation();
+		Util.staticModule.startModule();
 	}
 
 	@Then("^The DummyApp should wait for the simulator to finish sending all data$")
