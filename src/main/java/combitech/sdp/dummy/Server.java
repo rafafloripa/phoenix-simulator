@@ -269,4 +269,6 @@ public class Server implements Runnable {
 	public HashMap<Integer, LinkedList<SCSData>> getReceivedValues() {
 		return receivedValues;
 	}
+	
+	public void dummy(){}
 }
