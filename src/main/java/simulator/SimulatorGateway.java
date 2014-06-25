@@ -5,10 +5,13 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.swedspot.vil.configuration.ConfigurationFactory;
+
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.sdp.SDPFactory;
+import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPDataListener;
 import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
@@ -48,7 +51,9 @@ public class SimulatorGateway {
 		simulatorGateway.start();
 
 		simulatorGateways.add(simulatorGateway);
-		nodes.add(SCSFactory.createSCSInstance(tmpNode));
+		
+		Configuration conf = ConfigurationFactory.getConfiguration();
+		nodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -102,10 +107,15 @@ public class SimulatorGateway {
 	 * Unprovides all signals for all current nodes but retains the IDs
 	 */
 	public void unprovideAll() {
-		for (SCS node : nodes) {
-			for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
-				node.unprovide(entry.getKey());
+		lock.lock();
+		try {
+			for (SCS node : nodes) {
+				for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
+					node.unprovide(entry.getKey());
+				}
 			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
@@ -114,10 +124,15 @@ public class SimulatorGateway {
 	 * all current nodes
 	 */
 	public void provideAll() {
-		for (SCS node : nodes) {
-			for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
-				node.provide(entry.getKey());
+		lock.lock();
+		try {
+			for (SCS node : nodes) {
+				for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
+					node.provide(entry.getKey());
+				}
 			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
@@ -130,18 +145,29 @@ public class SimulatorGateway {
 	 * @param data
 	 */
 	public void sendValue(int signalID, SCSData data) {
-		for (SCS node : nodes)
-			node.send(signalID, data);
-		lastValueSent.put(signalID, data);
+		lock.lock();
+		try {
+			for (SCS node : nodes)
+				node.send(signalID, data);
+			lastValueSent.put(signalID, data);
+		} finally {
+			lock.unlock();
+		}
+
 	}
 
 	public void disconnectSimulator() {
-		for (SDPGatewayNode simulatorGateway : simulatorGateways) {
-			for (SDPNode node : simulatorGateway.connections()) {
-				simulatorGateway.disconnect(node);
+		lock.lock();
+		try {
+			for (SDPGatewayNode simulatorGateway : simulatorGateways) {
+				for (SDPNode node : simulatorGateway.connections()) {
+					simulatorGateway.disconnect(node);
+				}
+				simulatorGateway.stop();
 			}
-			simulatorGateway.stop();
+			simulatorGateways.clear();
+		} finally {
+			lock.unlock();
 		}
-		simulatorGateways.clear();
 	}
 }

@@ -3,6 +3,8 @@ package acceptancetest.util;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import com.swedspot.vil.configuration.ConfigurationFactory;
+
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
@@ -10,6 +12,7 @@ import android.swedspot.scs.SCSStatusListener;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.SubscriptionStatus;
+import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
@@ -28,7 +31,8 @@ public class DummyApplication {
 
         dummyAppGateway = SDPFactory.createGatewayServerInstance();
         dummyAppGateway.init(new SDPNodeEthAddress("localhost", portToRunOn), dummyAppNode);
-        dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode);
+        Configuration conf = ConfigurationFactory.getConfiguration();
+        dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode, conf);
         dummySCSNode.setDataListener(new SCSDataListener() {
 
             @Override
