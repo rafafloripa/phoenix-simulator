@@ -1,7 +1,7 @@
 package simulator.steeringwheel.gxt27;
 
+import static simulator.SimulationModuleState.RUNNING;
 import net.java.games.input.Component;
-import static simulator.SimulationModuleState.*;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
 import net.java.games.input.DirectAndRawInputEnvironmentPlugin;
@@ -21,7 +21,7 @@ public class GXT27Module extends BasicModule {
     private Component com;
 
     public GXT27Module(SimulatorGateway gateway) {
-    	super(gateway);
+        super(gateway);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class GXT27Module extends BasicModule {
             return;
         }
 
-        while (state == RUNNING)            
+        while (state == RUNNING)
             updateControllerModel(controller.poll());
     }
 
@@ -191,8 +191,8 @@ public class GXT27Module extends BasicModule {
 
     }
 
-	@Override
-	public int[] getProvidingSingals() {
-		return new int[]{STEERING_WHEEL_ID};
-	}
+    @Override
+    public int[] getProvidingSingals() {
+        return new int[] { STEERING_WHEEL_ID };
+    }
 }
