@@ -3,6 +3,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'pmd'
 apply plugin: 'jacoco'
+apply plugin: 'application'
 
 
 targetCompatibility = 1.7
@@ -25,6 +26,8 @@ jar {
         attributes 'Implementation-Title': 'Simulator', 'Implementation-Version': version
     }
 }
+
+mainClassName = "combitech.sdp.dummy.Server"
 
 repositories {
     mavenCentral()
