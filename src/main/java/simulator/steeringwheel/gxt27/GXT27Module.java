@@ -1,6 +1,9 @@
 package simulator.steeringwheel.gxt27;
 
 import static simulator.SimulationModuleState.RUNNING;
+
+import java.net.URL;
+
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
@@ -38,6 +41,7 @@ public class GXT27Module extends BasicModule {
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
+        String path = getClass().getClassLoader().getResource(".").getPath();
         System.setProperty("net.java.games.input.librarypath", "C:/workspace/simulator/libs/natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
@@ -65,41 +69,7 @@ public class GXT27Module extends BasicModule {
 
     private void updateControllerModel(boolean didPoll) {
         if (didPoll) {
-            com = controller.getComponent(Button._0);
-            if (com.getPollData() > 0) {
-                model.triangle = true;
-                // LOGGER.debug("triangle");
-            } else if (model.triangle) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
-                model.triangle = false;
-            }
 
-            com = controller.getComponent(Button._1);
-            if (com.getPollData() > 0) {
-                model.circle = true;
-                // LOGGER.debug("circle");
-            } else if (model.circle) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
-                model.circle = false;
-            }
-
-            com = controller.getComponent(Button._2);
-            if (com.getPollData() > 0) {
-                model.cross = true;
-                // LOGGER.debug("cross");
-            } else if (model.cross) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
-                model.cross = false;
-            }
-
-            com = controller.getComponent(Button._3);
-            if (com.getPollData() > 0) {
-                model.square = true;
-                // LOGGER.debug("square");
-            } else if (model.square) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
-                model.square = false;
-            }
             com = controller.getComponent(Component.Identifier.Axis.POV);
             float pollData = com.getPollData();
             if (pollData > 0) {
@@ -120,75 +90,108 @@ public class GXT27Module extends BasicModule {
                     // LOGGER.debug("left");
                 }
             } else if (model.up) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
                 model.up = false;
             } else if (model.right) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
                 model.right = false;
             } else if (model.down) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
                 model.down = false;
             } else if (model.left) {
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
                 model.left = false;
+            }
+            com = controller.getComponent(Button._4);
+            if (com.getPollData() > 0) {
+                model.plus = true;
+                // LOGGER.debug("plus");
+            } else if (model.plus) {
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
+                model.plus = false;
+            }
+
+            com = controller.getComponent(Button._7);
+            if (com.getPollData() > 0) {
+                model.minus = true;
+                // LOGGER.debug("minus");
+            } else if (model.minus) {
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
+                model.minus = false;
+            }
+
+            com = controller.getComponent(Button._8);
+            if (com.getPollData() > 0) {
+                model.power  = true;
+                // LOGGER.debug("power");
+            } else if (model.power  ) {
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
+                model.power  = false;
+            }
+
+            com = controller.getComponent(Button._9);
+            if (com.getPollData() > 0) {
+                model.app = true;
+                // LOGGER.debug("app");
+            } else if (model.app) {
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
+                model.app = false;
+            }
+
+            com = controller.getComponent(Button._10);
+            if (com.getPollData() > 0) {
+                model.back = true;
+                // LOGGER.debug("back");
+            } else if (model.back) {
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 8));
+                model.back = false;
+            }
+            
+            com = controller.getComponent(Button._11);
+            if (com.getPollData() > 0) {
+                model.select = true;
+                // LOGGER.debug("select");
+            } else if (model.select) {
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 9));
+                model.select = false;
             }
         }
     }
 
     class ControllerModel {
-        private boolean square = false;
-        private boolean circle = false;
-        private boolean triangle = false;
-        private boolean cross = false;
         private boolean up = false;
         private boolean right = false;
         private boolean down = false;
         private boolean left = false;
+        private boolean app = false;
+        private boolean power = false;
+        private boolean back = false;
+        private boolean select = false;
+        private boolean minus = false;
+        private boolean plus = false;
 
         public int getFlags() {
-            int squareInt = 0;
-            int circleInt = 0;
-            int triangleInt = 0;
-            int crossInt = 0;
-            int upInt = 0;
-            int rightInt = 0;
-            int downInt = 0;
-            int leftInt = 0;
-            if (square) {
-                squareInt = 1;
-            }
-            if (circle) {
-                circleInt = 1;
-            }
-            if (triangle) {
-                triangleInt = 1;
-            }
-            if (cross) {
-                crossInt = 1;
-            }
-
-            if (up) {
-                upInt = 1;
-            }
-            if (right) {
-                rightInt = 1;
-            }
-            if (down) {
-                downInt = 1;
-            }
-            if (left) {
-                leftInt = 1;
-            }
-            return (squareInt << 0) +
-                    (circleInt << 1) +
-                    (triangleInt << 2) +
-                    (crossInt << 3) +
-                    (upInt << 4) +
-                    (rightInt << 5) +
-                    (downInt << 6) +
-                    (leftInt << 7);
+            int upInt = up ? 1 : 0;
+            int rightInt = right ? 1 : 0;
+            int downInt = down ? 1 : 0;
+            int leftInt = left ? 1 : 0;
+            int appInt = app ? 1 : 0;
+            int powerInt = power ? 1 : 0;
+            int backInt = back ? 1 : 0;
+            int selectInt = select ? 1 : 0;
+            int minusInt = minus ? 1 : 0;
+            int plusInt = plus ? 1 : 0;
+            return (upInt << 0) +
+                    (rightInt << 1) +
+                    (downInt << 2) +
+                    (leftInt << 3) +
+                    (plusInt << 4) +
+                    (minusInt << 5) +
+                    (powerInt << 6) +
+                    (appInt << 7) +
+                    (backInt << 8) +
+                    (selectInt << 9);
         }
-
     }
 
     @Override
