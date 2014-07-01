@@ -1,0 +1,14 @@
+Triangle 	- 	Button._0
+Right_pedal	-	Button._0
+Circle		-	Button._1
+Left_pedal	-	Button._1
+Cross		-	Button._2
+Square		-	Button._3
+R2		-	Button._4
+L2		-	Button._5
+L1		-	Button._6
+R1		-	Button._7
+Select		-	Button._8
+Start		-	Button._9
+L3		-	Button._10
+R3		-	Button._11
