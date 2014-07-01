@@ -63,8 +63,10 @@ public class Torcs extends BasicModule {
 						new InputStreamReader(clientSocket.getInputStream()));
 
 				while (state == RUNNING && clientSocket.isConnected()) {
-					signalUpdate = inFromTorcs.readLine().trim();
-					extractValues(signalUpdate);
+				    
+					signalUpdate = inFromTorcs.readLine();
+					if (signalUpdate.length() > 70){
+					extractValues(signalUpdate.trim());
 					gateway.sendValue(
 							AutomotiveSignalId.FMS_WHEEL_BASED_SPEED,
 							new SCSFloat(speed));
@@ -80,7 +82,7 @@ public class Torcs extends BasicModule {
 					        new SCSFloat(engineSpeed));
 					gateway.sendValue(AutomotiveSignalId.FMS_ACCELERATOR_PEDAL_POSITION_1, 
 					        new SCSFloat(acceleratorPedalPosition));
-					
+					}
 					Thread.sleep(30);
 				}
 			} catch (Exception e1) {
@@ -90,6 +92,7 @@ public class Torcs extends BasicModule {
 	}
 
 	private void extractValues(String signalUpdate) {
+	    System.out.println(signalUpdate);
 		String[] values = signalUpdate.replace("FromTorcs ", "").split(";");
 		try {
 			fuelLevel = Float.parseFloat(values[0]);
@@ -99,7 +102,7 @@ public class Torcs extends BasicModule {
 			distance = Long.parseLong(values[4]);
 			engineSpeed = Float.parseFloat(values[5]);
 			acceleratorPedalPosition = Float.parseFloat(values[6]);
-		} catch (NumberFormatException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
