@@ -1,5 +1,6 @@
 package simulator.steeringwheel.gxt27;
 
+import static simulator.SimulationModuleState.RUNNING;
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
@@ -9,20 +10,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import simulator.BasicModule;
+import simulator.SimulatorGateway;
+import android.swedspot.scs.data.Uint32;
 
-import com.swedspot.scs.data.Uint32;
-
-public class GXT27Module extends BasicModule implements Runnable {
+public class GXT27Module extends BasicModule {
     private final static Logger LOGGER = LoggerFactory.getLogger(GXT27Module.class);
     public final static int STEERING_WHEEL_ID = 514;
-    private boolean isRunning = false;
-    private boolean isPaused = false;
-    private Thread gxt27InputThread;
     private Controller controller;
     private ControllerModel model;
     private Component com;
 
-    public GXT27Module() {
+    public GXT27Module(SimulatorGateway gateway) {
+        super(gateway);
     }
 
     @Override
@@ -33,24 +32,13 @@ public class GXT27Module extends BasicModule implements Runnable {
             return;
         }
 
-        while (isRunning) {
-            
+        while (state == RUNNING)
             updateControllerModel(controller.poll());
-            
-            while (isPaused) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
     }
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
-        System.setProperty("net.java.games.input.librarypath", "C:/Users/Nine/workspace/simulator-gui/libs/natives");
+        System.setProperty("net.java.games.input.librarypath", "C:/workspace/simulator/libs/natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
@@ -82,7 +70,7 @@ public class GXT27Module extends BasicModule implements Runnable {
                 model.triangle = true;
                 // LOGGER.debug("triangle");
             } else if (model.triangle) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
                 model.triangle = false;
             }
 
@@ -91,7 +79,7 @@ public class GXT27Module extends BasicModule implements Runnable {
                 model.circle = true;
                 // LOGGER.debug("circle");
             } else if (model.circle) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
                 model.circle = false;
             }
 
@@ -100,7 +88,7 @@ public class GXT27Module extends BasicModule implements Runnable {
                 model.cross = true;
                 // LOGGER.debug("cross");
             } else if (model.cross) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
                 model.cross = false;
             }
 
@@ -109,7 +97,7 @@ public class GXT27Module extends BasicModule implements Runnable {
                 model.square = true;
                 // LOGGER.debug("square");
             } else if (model.square) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
                 model.square = false;
             }
             com = controller.getComponent(Component.Identifier.Axis.POV);
@@ -132,67 +120,19 @@ public class GXT27Module extends BasicModule implements Runnable {
                     // LOGGER.debug("left");
                 }
             } else if (model.up) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
                 model.up = false;
             } else if (model.right) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
                 model.right = false;
             } else if (model.down) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
                 model.down = false;
             } else if (model.left) {
-                simulator.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
                 model.left = false;
             }
         }
-    }
-
-    @Override
-    public void startSimulation() throws Exception {
-        LOGGER.debug("\nStarting the simulation\n");
-        isRunning = true;
-        gxt27InputThread = new Thread(this);
-        simulator.provideSignal(STEERING_WHEEL_ID);
-        gxt27InputThread.start();
-        LOGGER.debug("\nStarted the simulation\n");
-    }
-
-    @Override
-    public void stopSimulation() throws Exception {
-        isRunning = false;
-        isPaused = false;
-        simulator.unprovideSignal(STEERING_WHEEL_ID);
-        gxt27InputThread.join();
-
-    }
-
-    @Override
-    public void pauseSimulation() throws Exception {
-        isPaused = true;
-    }
-
-    @Override
-    public void resumeSimulation() throws Exception {
-        isPaused = false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof GXT27Module) {
-            GXT27Module other = (GXT27Module) o;
-            if (model.equals(other.model)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return model.hashCode() * STEERING_WHEEL_ID + gxt27InputThread.hashCode() * 1000;
     }
 
     class ControllerModel {
@@ -204,73 +144,6 @@ public class GXT27Module extends BasicModule implements Runnable {
         private boolean right = false;
         private boolean down = false;
         private boolean left = false;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o instanceof ControllerModel) {
-                ControllerModel other = (ControllerModel) o;
-                return square == other.square &&
-                        circle == other.circle &&
-                        triangle == other.triangle &&
-                        cross == other.cross &&
-                        up == other.up &&
-                        right == other.right &&
-                        down == other.down &&
-                        left == other.left;
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            int squareInt = 0;
-            int circleInt = 0;
-            int triangleInt = 0;
-            int crossInt = 0;
-
-            int upInt = 0;
-            int rightInt = 0;
-            int downInt = 0;
-            int leftInt = 0;
-
-            if (square) {
-                squareInt = 1;
-            }
-            if (circle) {
-                circleInt = 1;
-            }
-            if (triangle) {
-                triangleInt = 1;
-            }
-            if (cross) {
-                crossInt = 1;
-            }
-
-            if (up) {
-                upInt = 1;
-            }
-            if (right) {
-                rightInt = 1;
-            }
-            if (down) {
-                downInt = 1;
-            }
-            if (left) {
-                leftInt = 1;
-            }
-
-            return squareInt * 1 +
-                    circleInt * 5 +
-                    triangleInt * 10 +
-                    crossInt * 15 +
-                    upInt * 20 +
-                    rightInt * 25 +
-                    downInt * 30 +
-                    leftInt * 35;
-        }
 
         public int getFlags() {
             int squareInt = 0;
@@ -316,5 +189,10 @@ public class GXT27Module extends BasicModule implements Runnable {
                     (leftInt << 7);
         }
 
+    }
+
+    @Override
+    public int[] getProvidingSingals() {
+        return new int[] { STEERING_WHEEL_ID };
     }
 }

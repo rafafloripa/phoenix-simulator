@@ -2,7 +2,7 @@ package acceptancetest.subscribe;
 
 import static org.junit.Assert.*;
 
-import com.swedspot.scs.data.Uint32;
+import android.swedspot.scs.data.Uint32;
 
 import acceptancetest.util.Predicate;
 import acceptancetest.util.Util;

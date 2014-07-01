@@ -1,25 +1,50 @@
 package simulator;
 
-public abstract class BasicModule {
+public abstract class BasicModule implements Runnable {
 
-    protected Simulator simulator;
+    protected SimulatorGateway gateway;
+    protected SimulationModuleState state;
+    protected Thread moduleThread;
 
-    public abstract void startSimulation() throws Exception;
-
-    public abstract void stopSimulation() throws Exception;
-
-    public abstract void pauseSimulation() throws Exception;
-
-    public abstract void resumeSimulation() throws Exception;
-
-    public void setSimulator(Simulator simulator)
-    {
-        this.simulator = simulator;
+    public BasicModule(SimulatorGateway gateway){
+    	this.gateway = gateway;
     }
     
-    @Override
-    public abstract boolean equals(Object o);
+    public void startModule()
+    {
+    	provide();
+    	state = SimulationModuleState.RUNNING;
+    	moduleThread = new Thread(this);
+    	moduleThread.start();
+    }
 
-	@Override
-	public abstract int hashCode();
+    public void stopModule()
+    {
+    	state = SimulationModuleState.STOPPED;
+    	unprovide();
+    	try {
+			moduleThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public void setSimulator(SimulatorGateway simulator)
+    {
+        this.gateway = simulator;
+    }
+    
+    public abstract int[] getProvidingSingals();
+    
+    protected void provide()
+    {
+    	for (int signalID : getProvidingSingals())
+			gateway.provideSignal(signalID);
+    }
+    
+    protected void unprovide()
+    {
+    	for (int signalID : getProvidingSingals())
+			gateway.unprovideSignal(signalID);
+    }
 }

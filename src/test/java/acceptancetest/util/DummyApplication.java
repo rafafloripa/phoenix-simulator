@@ -3,17 +3,20 @@ package acceptancetest.util;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import com.swedspot.scs.SCS;
-import com.swedspot.scs.SCSDataListener;
-import com.swedspot.scs.SCSFactory;
-import com.swedspot.scs.SCSStatusListener;
-import com.swedspot.scs.data.SCSData;
-import com.swedspot.sdp.SDPFactory;
-import com.swedspot.sdp.SubscriptionStatus;
-import com.swedspot.sdp.observer.SDPGatewayNode;
-import com.swedspot.sdp.observer.SDPNode;
-import com.swedspot.sdp.routing.SDPNodeEthAddress;
-import com.swedspot.sdp.util.Converter;
+import com.swedspot.vil.configuration.ConfigurationFactory;
+
+import android.swedspot.scs.SCS;
+import android.swedspot.scs.SCSDataListener;
+import android.swedspot.scs.SCSFactory;
+import android.swedspot.scs.SCSStatusListener;
+import android.swedspot.scs.data.SCSData;
+import android.swedspot.sdp.SDPFactory;
+import android.swedspot.sdp.SubscriptionStatus;
+import android.swedspot.sdp.configuration.Configuration;
+import android.swedspot.sdp.observer.SDPGatewayNode;
+import android.swedspot.sdp.observer.SDPNode;
+import android.swedspot.sdp.routing.SDPNodeEthAddress;
+import android.swedspot.sdp.util.Converter;
 
 public class DummyApplication {
     SDPNode dummyAppNode;
@@ -28,7 +31,8 @@ public class DummyApplication {
 
         dummyAppGateway = SDPFactory.createGatewayServerInstance();
         dummyAppGateway.init(new SDPNodeEthAddress("localhost", portToRunOn), dummyAppNode);
-        dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode);
+        Configuration conf = ConfigurationFactory.getConfiguration();
+        dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode, conf);
         dummySCSNode.setDataListener(new SCSDataListener() {
 
             @Override
@@ -72,5 +76,9 @@ public class DummyApplication {
 
     public void stop() {
         dummyAppGateway.stop();
+        for (int i = 0; i < dummyAppGateway.connections().size(); i++) {
+        	dummyAppGateway.disconnect(dummyAppGateway.connections().iterator().next());
+		}
+        dummyAppGateway = null;
     }
 }
