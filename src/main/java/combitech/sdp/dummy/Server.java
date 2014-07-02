@@ -98,6 +98,10 @@ public class Server implements Runnable {
 		String[] cmd = new String[] {};
 		String cmdLine = "";
 		printWelcomeMessage();
+		if(System.console() == null){
+			startServer();
+			while(true){}
+		}
 		while (isRunning) {
 			System.out.print("\n\nEnter command > ");
 			cmdLine = System.console().readLine();
@@ -230,11 +234,9 @@ public class Server implements Runnable {
 	public static void main(String[] args) {
 		Server dummyServer = new Server();
 		dummyServer.start();
-
 		try {
 			serverThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
 		}
 		System.out.println("Good Bye!");
 		System.exit(1);
