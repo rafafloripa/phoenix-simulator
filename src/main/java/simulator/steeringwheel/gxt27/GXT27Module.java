@@ -1,9 +1,6 @@
 package simulator.steeringwheel.gxt27;
 
 import static simulator.SimulationModuleState.RUNNING;
-
-import java.net.URL;
-
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
@@ -41,8 +38,9 @@ public class GXT27Module extends BasicModule {
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
-        String path = getClass().getClassLoader().getResource(".").getPath();
-        System.setProperty("net.java.games.input.librarypath", "C:/workspace/simulator/libs/natives");
+        String binPath = getClass().getClassLoader().getResource(".").getPath();
+        String fixedPath = binPath.substring(0, binPath.length()-4);
+        System.setProperty("net.java.games.input.librarypath", fixedPath+"/libs/natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
@@ -87,37 +85,37 @@ public class GXT27Module extends BasicModule {
                 }
             } else if (model.up) {
                 LOGGER.debug("up");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
                 model.up = false;
             } else if (model.right) {
                 LOGGER.debug("right");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
                 model.right = false;
             } else if (model.down) {
                 LOGGER.debug("down");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
                 model.down = false;
             } else if (model.left) {
                 LOGGER.debug("left");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
                 model.left = false;
             }
             com = controller.getComponent(Button._4);
             if (com.getPollData() > 0) {
-                model.plus = true;
-            } else if (model.plus) {
-                LOGGER.debug("plus");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
-                model.plus = false;
-            }
-
-            com = controller.getComponent(Button._7);
-            if (com.getPollData() > 0) {
                 model.minus = true;
             } else if (model.minus) {
                 LOGGER.debug("minus");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 9));
                 model.minus = false;
+            } 
+
+            com = controller.getComponent(Button._7);
+            if (com.getPollData() > 0) {
+                model.plus = true;
+            } else if (model.plus) {
+                LOGGER.debug("plus");
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 8));
+                model.plus = false;
             }
 
             com = controller.getComponent(Button._8);
@@ -125,7 +123,7 @@ public class GXT27Module extends BasicModule {
                 model.home = true;
             } else if (model.home) {
                 LOGGER.debug("home");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
                 model.home = false;
             }
 
@@ -134,7 +132,7 @@ public class GXT27Module extends BasicModule {
                 model.app = true;
             } else if (model.app) {
                 LOGGER.debug("app");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
                 model.app = false;
             }
 
@@ -143,7 +141,7 @@ public class GXT27Module extends BasicModule {
                 model.back = true;
             } else if (model.back) {
                 LOGGER.debug("back");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 8));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
                 model.back = false;
             }
 
@@ -152,7 +150,7 @@ public class GXT27Module extends BasicModule {
                 model.select = true;
             } else if (model.select) {
                 LOGGER.debug("select");
-                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 9));
+                gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
                 model.select = false;
             }
 
