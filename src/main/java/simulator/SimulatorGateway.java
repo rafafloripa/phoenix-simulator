@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.data.SCSData;
-import android.swedspot.sdp.ConnectionStatus;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPConnectionListener;
@@ -24,7 +23,6 @@ public class SimulatorGateway {
     private HashMap<Integer, SCSData> lastValueSent;
     private LinkedList<SDPGatewayNode> simulatorGateways;
     private LinkedList<SCS> nodes;
-    private boolean connected = false;
     private ReentrantLock lock;
 
     public SimulatorGateway() {
@@ -35,7 +33,7 @@ public class SimulatorGateway {
         lastValueSent = new HashMap<>();
     }
 
-    public boolean addAndInitiateNode(String adress, int port) {
+    public boolean addAndInitiateNode(String adress, int port, SDPConnectionListener connectionListener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
@@ -52,14 +50,7 @@ public class SimulatorGateway {
             }
         });
         simulatorGateway.start();
-        simulatorGateway.setConnectionListener(new SDPConnectionListener() {
-
-            @Override
-            public void connectionStatusChanged(ConnectionStatus newStatus) {
-                connected = newStatus == ConnectionStatus.CONNECTED ? true : false;
-            }
-        });
-
+        simulatorGateway.setConnectionListener(connectionListener);
         simulatorGateways.add(simulatorGateway);
 
         Configuration conf = ConfigurationFactory.getConfiguration();
@@ -179,9 +170,5 @@ public class SimulatorGateway {
         } finally {
             lock.unlock();
         }
-    }
-
-    public boolean isConnected() {
-        return connected;
     }
 }
