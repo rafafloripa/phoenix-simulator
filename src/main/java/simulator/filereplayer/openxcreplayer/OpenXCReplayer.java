@@ -102,6 +102,7 @@ public class OpenXCReplayer extends BasicModule {
 
     @Override
     public void run() {
+        super.moduleThread.setName("OpenXC");
         String newLine = "";
         String openXCName = "";
         int id;

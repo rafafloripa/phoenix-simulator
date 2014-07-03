@@ -45,6 +45,7 @@ public class Torcs extends BasicModule {
 	
 	@Override
 	public void run() {
+	    super.moduleThread.setName("TORCS");
 		String signalUpdate;
         while (state == RUNNING) {
 			try {
@@ -83,7 +84,7 @@ public class Torcs extends BasicModule {
 					gateway.sendValue(AutomotiveSignalId.FMS_ACCELERATOR_PEDAL_POSITION_1, 
 					        new SCSFloat(acceleratorPedalPosition));
 					}
-					Thread.sleep(30);
+					Thread.sleep(18);
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -92,7 +93,6 @@ public class Torcs extends BasicModule {
 	}
 
 	private void extractValues(String signalUpdate) {
-	    System.out.println(signalUpdate);
 		String[] values = signalUpdate.replace("FromTorcs ", "").split(";");
 		try {
 			fuelLevel = Float.parseFloat(values[0]);

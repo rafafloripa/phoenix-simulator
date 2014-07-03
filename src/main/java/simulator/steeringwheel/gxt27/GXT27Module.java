@@ -26,21 +26,29 @@ public class GXT27Module extends BasicModule {
 
     @Override
     public void run() {
+        super.moduleThread.setName("GXT27Module");
         initDevice();
         if (controller == null) {
             LOGGER.debug("Could not find the Trust GXT 27 steering wheel");
             return;
         }
 
-        while (state == RUNNING)
+        while (state == RUNNING){
             updateControllerModel(controller.poll());
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
         String binPath = getClass().getClassLoader().getResource(".").getPath();
         String fixedPath = binPath.substring(0, binPath.length()-4);
-        System.setProperty("net.java.games.input.librarypath", fixedPath+"/libs/natives");
+        System.setProperty("net.java.games.input.librarypath", fixedPath + "/libs/natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
