@@ -1,16 +1,15 @@
 package simulator.steeringwheel.gxt27;
 
 import android.swedspot.scs.data.Uint32;
+import combitech.sdp.simulator.BasicModule;
+import combitech.sdp.simulator.SimulationModuleState;
+import combitech.sdp.simulator.SimulatorGateway;
 import net.java.games.input.Component;
 import net.java.games.input.Component.Identifier.Button;
 import net.java.games.input.Controller;
 import net.java.games.input.DirectAndRawInputEnvironmentPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import simulator.BasicModule;
-import simulator.SimulatorGateway;
-
-import static simulator.SimulationModuleState.RUNNING;
 
 public class GXT27Module extends BasicModule {
     public final static int STEERING_WHEEL_ID = 514;
@@ -32,7 +31,7 @@ public class GXT27Module extends BasicModule {
             return;
         }
 
-        while (state == RUNNING){
+        while (state == SimulationModuleState.RUNNING) {
             updateControllerModel(controller.poll());
             try {
                 Thread.sleep(10);
@@ -174,7 +173,7 @@ public class GXT27Module extends BasicModule {
     }
 
     @Override
-    public int[] getProvidingSingals() {
+    public int[] getProvidingSignals() {
         return new int[]{STEERING_WHEEL_ID};
     }
 
@@ -203,16 +202,16 @@ public class GXT27Module extends BasicModule {
             int minusInt = minus ? 1 : 0;
             int plusInt = plus ? 1 : 0;
             int homeInt = home ? 1 : 0;
-            return (upInt << 0) +
-                    (rightInt << 1) +
-                    (downInt << 2) +
-                    (leftInt << 3) +
-                    (plusInt << 4) +
-                    (minusInt << 5) +
-                    (homeInt << 6) +
-                    (appInt << 7) +
-                    (backInt << 8) +
-                    (enterInt << 9) +
+            return (homeInt << 0) +
+                    (appInt << 1) +
+                    (enterInt << 2) +
+                    (backInt << 3) +
+                    (upInt << 4) +
+                    (rightInt << 5) +
+                    (downInt << 6) +
+                    (leftInt << 7) +
+                    (plusInt << 8) +
+                    (minusInt << 9) +
                     (powerInt << 10);
         }
     }

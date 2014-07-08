@@ -1,5 +1,5 @@
-import simulator.SimulatorGateway;
-import simulator.car.torcs.Torcs;
+import combitech.sdp.simulator.SimulatorGateway;
+import combitech.sdp.simulator.car.torcs.Torcs;
 import simulator.steeringwheel.gxt27.GXT27Module;
 
 public class Main {

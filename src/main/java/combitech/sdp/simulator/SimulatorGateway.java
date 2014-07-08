@@ -1,4 +1,4 @@
-package simulator;
+package combitech.sdp.simulator;
 
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSFactory;
@@ -12,7 +12,6 @@ import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
 import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.configuration.VilConstants;
-import com.swedspot.vil.distraction.impl.DriverDistractionImpl;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,22 +19,22 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SimulatorGateway {
-
+    private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
+    private static final int HARDWARE_KEY_ID = 514;
 
     private HashMap<Integer, Integer> provideMap;
     private HashMap<Integer, SCSData> lastValueSent;
-    private LinkedList<SDPGatewayNode> signalGateways;
-    private LinkedList<SDPGatewayNode> driverDistractionGateways;
-    private LinkedList<SDPGatewayNode> hardwareKeyGateways;
-    private LinkedList<SCS> nodes;
+    private LinkedList<SDPGatewayNode> simulatorGateways;
+    private LinkedList<SCS> driverDistractionNodes;
+    private LinkedList<SCS> hardwareKeyNodes;
+    private LinkedList<SCS> signalNodes;
     private ReentrantLock lock;
-    private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
 
     public SimulatorGateway() {
-        signalGateways = new LinkedList<>();
-        driverDistractionGateways = new LinkedList<>();
-        hardwareKeyGateways = new LinkedList<>();
-        nodes = new LinkedList<>();
+        simulatorGateways = new LinkedList<>();
+        driverDistractionNodes = new LinkedList<>();
+        hardwareKeyNodes = new LinkedList<>();
+        signalNodes = new LinkedList<>();
         provideMap = new HashMap<>();
         lock = new ReentrantLock();
         lastValueSent = new HashMap<>();
@@ -50,7 +49,8 @@ public class SimulatorGateway {
         simulatorGateway.addDataListener(new SDPDataListener() {
             @Override
             public byte[] request(int signalID) {
-                return lastValueSent.get(signalID).getData();
+                byte[] data = lastValueSent.get(signalID).getData();
+                return data != null ? data : new byte[]{0};
             }
 
             @Override
@@ -61,25 +61,21 @@ public class SimulatorGateway {
         simulatorGateway.start();
         simulatorGateway.setConnectionListener(connectionListener);
 
-        if (port == VilConstants.API_PORT) {
-            signalGateways.add(simulatorGateway);
-        } else if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
-            driverDistractionGateways.add(simulatorGateway);
-        } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
-            hardwareKeyGateways.add(simulatorGateway);
-        }
+        simulatorGateways.add(simulatorGateway);
         Configuration conf = ConfigurationFactory.getConfiguration();
-        nodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+        if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
+            driverDistractionNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
+        } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
+            hardwareKeyNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
+        } else {
+            signalNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
         }
         return true;
     }
 
     /**
-     * The Simulator provides on all nodes a signal id
+     * The Simulator provides on all signalNodes a signal id
      *
      * @param signalID
      */
@@ -88,7 +84,7 @@ public class SimulatorGateway {
         try {
             if (!provideMap.containsKey(signalID)) {
                 provideMap.put(signalID, 1);
-                for (SCS node : nodes)
+                for (SCS node : signalNodes)
                     node.provide(signalID);
             } else {
                 provideMap.put(signalID, provideMap.get(signalID) + 1);
@@ -99,7 +95,7 @@ public class SimulatorGateway {
     }
 
     /**
-     * The Simulator unprovides on all nodes a signal id
+     * The Simulator unprovides on all signalNodes a signal id
      *
      * @param signalID
      */
@@ -109,7 +105,7 @@ public class SimulatorGateway {
             if (provideMap.containsKey(signalID)) {
                 provideMap.put(signalID, provideMap.get(signalID) - 1);
                 if (provideMap.get(signalID) == 0) {
-                    for (SCS node : nodes)
+                    for (SCS node : signalNodes)
                         node.unprovide(signalID);
                     provideMap.remove(signalID);
                 }
@@ -120,12 +116,12 @@ public class SimulatorGateway {
     }
 
     /**
-     * Unprovides all signals for all current nodes but retains the IDs
+     * Unprovides all signals for all current signalNodes but retains the IDs
      */
     public void unprovideAll() {
         lock.lock();
         try {
-            for (SCS node : nodes) {
+            for (SCS node : signalNodes) {
                 for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
                     node.unprovide(entry.getKey());
                 }
@@ -137,12 +133,12 @@ public class SimulatorGateway {
 
     /**
      * Provides all signals that have not been removed from the simulator for
-     * all current nodes
+     * all current signalNodes
      */
     public void provideAll() {
         lock.lock();
         try {
-            for (SCS node : nodes) {
+            for (SCS node : signalNodes) {
                 for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
                     node.provide(entry.getKey());
                 }
@@ -153,7 +149,7 @@ public class SimulatorGateway {
     }
 
     /**
-     * Sends a single signal to all connected nodes It is important that the
+     * Sends a single signal to all connected signalNodes It is important that the
      * SCSData match the signal id
      *
      * @param signalID
@@ -162,9 +158,16 @@ public class SimulatorGateway {
     public void sendValue(int signalID, SCSData data) {
         lock.lock();
         try {
-            if(signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID){}
-            for (SCS node : nodes)
-                node.send(signalID, data);
+            if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+                for (SCS node : driverDistractionNodes)
+                    node.send(signalID, data);
+            } else if (signalID == HARDWARE_KEY_ID) {
+                for (SCS node : hardwareKeyNodes)
+                    node.send(signalID, data);
+            } else {
+                for (SCS node : signalNodes)
+                    node.send(signalID, data);
+            }
             lastValueSent.put(signalID, data);
         } finally {
             lock.unlock();
@@ -175,10 +178,10 @@ public class SimulatorGateway {
     public void disconnectSimulator() {
         lock.lock();
         try {
-            for (SDPGatewayNode simulatorGateway : signalGateways) {
+            for (SDPGatewayNode simulatorGateway : simulatorGateways) {
                 simulatorGateway.stop();
             }
-            signalGateways.clear();
+            simulatorGateways.clear();
         } finally {
             lock.unlock();
         }

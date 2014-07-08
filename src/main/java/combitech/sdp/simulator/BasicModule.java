@@ -1,4 +1,4 @@
-package simulator;
+package combitech.sdp.simulator;
 
 public abstract class BasicModule implements Runnable {
 
@@ -31,15 +31,15 @@ public abstract class BasicModule implements Runnable {
         this.gateway = simulator;
     }
 
-    public abstract int[] getProvidingSingals();
+    public abstract int[] getProvidingSignals();
 
     protected void provide() {
-        for (int signalID : getProvidingSingals())
+        for (int signalID : getProvidingSignals())
             gateway.provideSignal(signalID);
     }
 
     protected void unprovide() {
-        for (int signalID : getProvidingSingals())
+        for (int signalID : getProvidingSignals())
             gateway.unprovideSignal(signalID);
     }
 

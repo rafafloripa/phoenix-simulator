@@ -1,6 +1,9 @@
 package simulator.filereplayer;
 
-import static simulator.SimulationModuleState.RUNNING;
+import android.swedspot.scs.data.Uint32;
+import combitech.sdp.simulator.BasicModule;
+import combitech.sdp.simulator.SimulationModuleState;
+import combitech.sdp.simulator.SimulatorGateway;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,10 +11,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
-import simulator.BasicModule;
-import simulator.SimulatorGateway;
-import android.swedspot.scs.data.Uint32;
 
 public class FileReplayer extends BasicModule {
 
@@ -28,6 +27,12 @@ public class FileReplayer extends BasicModule {
         super(gateway);
         dataValues = new ArrayList<>();
         providedIDs = new LinkedList<>();
+    }
+
+    public static String extractData(String input) {
+        String trimmedData = input.replaceAll("[[{}]]", "");
+        return trimmedData.substring(trimmedData.indexOf(":") + 1,
+                trimmedData.length());
     }
 
     public boolean readFile(File file) throws IOException {
@@ -52,12 +57,6 @@ public class FileReplayer extends BasicModule {
         return !dataValues.isEmpty();
     }
 
-    public static String extractData(String input) {
-        String trimmedData = input.replaceAll("[[{}]]", "");
-        return trimmedData.substring(trimmedData.indexOf(":") + 1,
-                trimmedData.length());
-    }
-
     @Override
     public void startModule() {
         super.startModule();
@@ -76,7 +75,7 @@ public class FileReplayer extends BasicModule {
     @Override
     public void run() {
         try {
-            while (state == RUNNING) {
+            while (state == SimulationModuleState.RUNNING) {
                 current = dataValues.get(index);
                 timeDiff = current.getTimestamp() - previousTimestamp;
                 if (timeDiff > 0) {
@@ -109,7 +108,7 @@ public class FileReplayer extends BasicModule {
     }
 
     @Override
-    public int[] getProvidingSingals() {
+    public int[] getProvidingSignals() {
         int[] tmp = new int[providedIDs.size()];
         for (int i = 0; i < providedIDs.size(); i++) {
             tmp[i] = providedIDs.get(i);

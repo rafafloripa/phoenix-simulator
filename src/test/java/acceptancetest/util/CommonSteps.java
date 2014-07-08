@@ -1,6 +1,6 @@
 package acceptancetest.util;
 
-import simulator.SimulatorGateway;
+import combitech.sdp.simulator.SimulatorGateway;
 import cucumber.api.java.After;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
