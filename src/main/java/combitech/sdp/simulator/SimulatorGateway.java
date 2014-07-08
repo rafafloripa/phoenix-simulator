@@ -161,12 +161,15 @@ public class SimulatorGateway {
             if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                 for (SCS node : driverDistractionNodes)
                     node.send(signalID, data);
+                System.out.println("sent data on driverDistractionNodes");
             } else if (signalID == HARDWARE_KEY_ID) {
                 for (SCS node : hardwareKeyNodes)
                     node.send(signalID, data);
+                System.out.println("sent data on hardwareNodes");
             } else {
                 for (SCS node : signalNodes)
                     node.send(signalID, data);
+                System.out.println("sent data on signalNodes");
             }
             lastValueSent.put(signalID, data);
         } finally {
