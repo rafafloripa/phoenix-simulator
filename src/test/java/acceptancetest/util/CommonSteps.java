@@ -32,7 +32,7 @@ public class CommonSteps {
     
     @Given("^Add a node to simulator on port (\\d+) and ip (.*)$")
     public void addNode(int port, String ipAdress){
-    	Util.staticSimulator.addAndInitiateNode(ipAdress, port);
+    	Util.staticSimulator.addAndInitiateNode(ipAdress, port, null);
     }
     
     @And("^After (\\d+) mSec have passed$")

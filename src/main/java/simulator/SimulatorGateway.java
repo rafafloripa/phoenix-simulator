@@ -3,7 +3,6 @@ package simulator;
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.data.SCSData;
-import android.swedspot.sdp.ConnectionStatus;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPConnectionListener;
@@ -29,7 +28,6 @@ public class SimulatorGateway {
     private LinkedList<SDPGatewayNode> driverDistractionGateways;
     private LinkedList<SDPGatewayNode> hardwareKeyGateways;
     private LinkedList<SCS> nodes;
-    private boolean connected = false;
     private ReentrantLock lock;
     private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
 
@@ -43,8 +41,8 @@ public class SimulatorGateway {
         lastValueSent = new HashMap<>();
     }
 
-    public boolean addAndInitiateNode(String address, int port) {
 
+    public boolean addAndInitiateNode(String address, int port, SDPConnectionListener connectionListener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
@@ -61,13 +59,7 @@ public class SimulatorGateway {
             }
         });
         simulatorGateway.start();
-        simulatorGateway.setConnectionListener(new SDPConnectionListener() {
-
-            @Override
-            public void connectionStatusChanged(ConnectionStatus newStatus) {
-                connected = newStatus == ConnectionStatus.CONNECTED ? true : false;
-            }
-        });
+        simulatorGateway.setConnectionListener(connectionListener);
 
         if (port == VilConstants.API_PORT) {
             signalGateways.add(simulatorGateway);
@@ -76,8 +68,6 @@ public class SimulatorGateway {
         } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
             hardwareKeyGateways.add(simulatorGateway);
         }
-
-
         Configuration conf = ConfigurationFactory.getConfiguration();
         nodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
         try {
@@ -192,9 +182,5 @@ public class SimulatorGateway {
         } finally {
             lock.unlock();
         }
-    }
-
-    public boolean isConnected() {
-        return connected;
     }
 }

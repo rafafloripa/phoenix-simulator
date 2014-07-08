@@ -25,14 +25,22 @@ public class GXT27Module extends BasicModule {
 
     @Override
     public void run() {
+        getModuleThread().setName("GXT27Module");
         initDevice();
         if (controller == null) {
             LOGGER.debug("Could not find the Trust GXT 27 steering wheel");
             return;
         }
 
-        while (state == RUNNING)
+        while (state == RUNNING){
             updateControllerModel(controller.poll());
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     private Controller getController() throws Exception {

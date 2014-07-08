@@ -30,6 +30,7 @@ public class SerialDevice extends BasicModule implements
 
 	@Override
 	public void run() {
+        getModuleThread().setName("SerialDevice");
 		if (portId == null) {
 			System.out.println("Could not find COM port.");
 			return;
