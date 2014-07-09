@@ -68,6 +68,9 @@ public class Server implements Runnable {
 				}, new DriverDistractionListener() {
 					@Override
 					public void levelChanged(DriverDistractionLevel level) {
+						System.out
+								.println("driver distraction level changed to "
+										+ level.getLevel());
 						lock.lock();
 						try {
 							LinkedList<SCSData> data = receivedValues
@@ -78,9 +81,6 @@ public class Server implements Runnable {
 							data.add(new Uint8(level.getLevel()));
 							receivedValues.put(DRIVER_DISTRACTION_ID, data);
 
-							System.out
-									.println("driver distraction level changed to "
-											+ level.getLevel());
 						} finally {
 							lock.unlock();
 						}
@@ -98,9 +98,10 @@ public class Server implements Runnable {
 		String[] cmd = new String[] {};
 		String cmdLine = "";
 		printWelcomeMessage();
-		if(System.console() == null){
+		if (System.console() == null) {
 			startServer();
-			while(true){}
+			while (true) {
+			}
 		}
 		while (isRunning) {
 			System.out.print("\n\nEnter command > ");
