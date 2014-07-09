@@ -1,7 +1,7 @@
 package acceptancetest.util;
 
-import simulator.BasicModule;
-import simulator.SimulatorGateway;
+import combitech.sdp.simulator.BasicModule;
+import combitech.sdp.simulator.SimulatorGateway;
 
 public class Util {
     public static DummyApplication staticDummyApp;
