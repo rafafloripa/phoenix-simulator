@@ -22,7 +22,7 @@ public class SerialDevice extends BasicModule implements
 	private CommPortIdentifier portId = null;
 	private static final int TIME_OUT = 2000;
 	private static final int DATA_RATE = 9600;
-	private static final int SIGNAL_ID = 515;
+	private static final int SIGNAL_ID = 0xDE01;
 
 	public SerialDevice(SimulatorGateway gateway) {
 		super(gateway);
