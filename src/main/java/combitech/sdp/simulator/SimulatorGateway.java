@@ -19,174 +19,175 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SimulatorGateway {
-    private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
-    private static final int HARDWARE_KEY_ID = 514;
+	private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
+	private static final int HARDWARE_KEY_ID = 514;
 
-    private HashMap<Integer, Integer> provideMap;
-    private HashMap<Integer, SCSData> lastValueSent;
-    private LinkedList<SDPGatewayNode> simulatorGateways;
-    private LinkedList<SCS> driverDistractionNodes;
-    private LinkedList<SCS> hardwareKeyNodes;
-    private LinkedList<SCS> signalNodes;
-    private ReentrantLock lock;
+	private HashMap<Integer, Integer> provideMap;
+	private HashMap<Integer, SCSData> lastValueSent;
+	private LinkedList<SDPGatewayNode> simulatorGateways;
+	private LinkedList<SCS> driverDistractionNodes;
+	private LinkedList<SCS> hardwareKeyNodes;
+	private LinkedList<SCS> signalNodes;
+	private ReentrantLock lock;
 
-    public SimulatorGateway() {
-        simulatorGateways = new LinkedList<>();
-        driverDistractionNodes = new LinkedList<>();
-        hardwareKeyNodes = new LinkedList<>();
-        signalNodes = new LinkedList<>();
-        provideMap = new HashMap<>();
-        lock = new ReentrantLock();
-        lastValueSent = new HashMap<>();
-    }
+	public SimulatorGateway() {
+		simulatorGateways = new LinkedList<>();
+		driverDistractionNodes = new LinkedList<>();
+		hardwareKeyNodes = new LinkedList<>();
+		signalNodes = new LinkedList<>();
+		provideMap = new HashMap<>();
+		lock = new ReentrantLock();
+		lastValueSent = new HashMap<>();
+	}
 
+	public boolean addAndInitiateNode(String address, int port,
+			SDPConnectionListener connectionListener) {
+		SDPNode tmpNode = SDPFactory.createNodeInstance();
+		SDPGatewayNode simulatorGateway = SDPFactory
+				.createGatewayClientInstance();
+		simulatorGateway.init(new SDPNodeEthAddress(address, port), tmpNode);
+		simulatorGateway.addDataListener(new SDPDataListener() {
+			@Override
+			public byte[] request(int signalID) {
+				byte[] data = lastValueSent.get(signalID).getData();
+				return data != null ? data : new byte[] { 0 };
+			}
 
-    public boolean addAndInitiateNode(String address, int port, SDPConnectionListener connectionListener) {
-        SDPNode tmpNode = SDPFactory.createNodeInstance();
-        SDPGatewayNode simulatorGateway = SDPFactory
-                .createGatewayClientInstance();
-        simulatorGateway.init(new SDPNodeEthAddress(address, port), tmpNode);
-        simulatorGateway.addDataListener(new SDPDataListener() {
-            @Override
-            public byte[] request(int signalID) {
-                byte[] data = lastValueSent.get(signalID).getData();
-                return data != null ? data : new byte[]{0};
-            }
+			@Override
+			public void receive(int signalID, byte[] data) {
+				// TODO deal with values received from the node
+			}
+		});
+		simulatorGateway.start();
+		simulatorGateway.setConnectionListener(connectionListener);
 
-            @Override
-            public void receive(int signalID, byte[] data) {
-                // TODO deal with values received from the node
-            }
-        });
-        simulatorGateway.start();
-        simulatorGateway.setConnectionListener(connectionListener);
+		simulatorGateways.add(simulatorGateway);
+		Configuration conf = ConfigurationFactory.getConfiguration();
 
-        simulatorGateways.add(simulatorGateway);
-        Configuration conf = ConfigurationFactory.getConfiguration();
+		if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
+			driverDistractionNodes.add(SCSFactory.createSCSInstance(tmpNode,
+					conf));
+		} else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
+			hardwareKeyNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
+		} else {
+			signalNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
+		}
+		return true;
+	}
 
-        if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
-            driverDistractionNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
-        } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
-            hardwareKeyNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
-        } else {
-            signalNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
-        }
-        return true;
-    }
+	/**
+	 * The Simulator provides on all signalNodes a signal id
+	 *
+	 * @param signalID
+	 */
+	public void provideSignal(int signalID) {
+		lock.lock();
+		try {
+			if (!provideMap.containsKey(signalID)) {
+				provideMap.put(signalID, 1);
+				for (SCS node : signalNodes)
+					node.provide(signalID);
+			} else {
+				provideMap.put(signalID, provideMap.get(signalID) + 1);
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
 
-    /**
-     * The Simulator provides on all signalNodes a signal id
-     *
-     * @param signalID
-     */
-    public void provideSignal(int signalID) {
-        lock.lock();
-        try {
-            if (!provideMap.containsKey(signalID)) {
-                provideMap.put(signalID, 1);
-                for (SCS node : signalNodes)
-                    node.provide(signalID);
-            } else {
-                provideMap.put(signalID, provideMap.get(signalID) + 1);
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
+	/**
+	 * The Simulator unprovides on all signalNodes a signal id
+	 *
+	 * @param signalID
+	 */
+	public void unprovideSignal(int signalID) {
+		lock.lock();
+		try {
+			if (provideMap.containsKey(signalID)) {
+				provideMap.put(signalID, provideMap.get(signalID) - 1);
+				if (provideMap.get(signalID) == 0) {
+					for (SCS node : signalNodes)
+						node.unprovide(signalID);
+					provideMap.remove(signalID);
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
 
-    /**
-     * The Simulator unprovides on all signalNodes a signal id
-     *
-     * @param signalID
-     */
-    public void unprovideSignal(int signalID) {
-        lock.lock();
-        try {
-            if (provideMap.containsKey(signalID)) {
-                provideMap.put(signalID, provideMap.get(signalID) - 1);
-                if (provideMap.get(signalID) == 0) {
-                    for (SCS node : signalNodes)
-                        node.unprovide(signalID);
-                    provideMap.remove(signalID);
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
+	/**
+	 * Unprovides all signals for all current signalNodes but retains the IDs
+	 */
+	public void unprovideAll() {
+		lock.lock();
+		try {
+			for (SCS node : signalNodes) {
+				for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
+					node.unprovide(entry.getKey());
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
 
-    /**
-     * Unprovides all signals for all current signalNodes but retains the IDs
-     */
-    public void unprovideAll() {
-        lock.lock();
-        try {
-            for (SCS node : signalNodes) {
-                for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
-                    node.unprovide(entry.getKey());
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
+	/**
+	 * Provides all signals that have not been removed from the simulator for
+	 * all current signalNodes
+	 */
+	public void provideAll() {
+		lock.lock();
+		try {
+			for (SCS node : signalNodes) {
+				for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
+					node.provide(entry.getKey());
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
 
-    /**
-     * Provides all signals that have not been removed from the simulator for
-     * all current signalNodes
-     */
-    public void provideAll() {
-        lock.lock();
-        try {
-            for (SCS node : signalNodes) {
-                for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
-                    node.provide(entry.getKey());
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
+	/**
+	 * Sends a single signal to all connected signalNodes It is important that
+	 * the SCSData match the signal id
+	 *
+	 * @param signalID
+	 * @param data
+	 */
+	public void sendValue(int signalID, SCSData data) {
+		lock.lock();
+		try {
+			if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+				for (SCS node : driverDistractionNodes)
+					node.send(signalID, data);
+				// System.out.println("sent data on driverDistractionNodes");
+			} else if (signalID == HARDWARE_KEY_ID) {
+				for (SCS node : hardwareKeyNodes)
+					node.send(signalID, data);
+				// System.out.println("sent data on hardwareNodes");
+			}
+			for (SCS node : signalNodes)
+				node.send(signalID, data);
+			// System.out.println("sent data on signalNodes");
 
-    /**
-     * Sends a single signal to all connected signalNodes It is important that the
-     * SCSData match the signal id
-     *
-     * @param signalID
-     * @param data
-     */
-    public void sendValue(int signalID, SCSData data) {
-        lock.lock();
-        try {
-            if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
-                for (SCS node : driverDistractionNodes)
-                    node.send(signalID, data);
-                //System.out.println("sent data on driverDistractionNodes");
-            } else if (signalID == HARDWARE_KEY_ID) {
-                for (SCS node : hardwareKeyNodes)
-                    node.send(signalID, data);
-                //System.out.println("sent data on hardwareNodes");
-            } else {
-                for (SCS node : signalNodes)
-                    node.send(signalID, data);
-                //System.out.println("sent data on signalNodes");
-            }
-            lastValueSent.put(signalID, data);
-        } finally {
-            lock.unlock();
-        }
+			lastValueSent.put(signalID, data);
+		} finally {
+			lock.unlock();
+		}
 
-    }
+	}
 
-    public void disconnectSimulator() {
-        lock.lock();
-        try {
-            for (SDPGatewayNode simulatorGateway : simulatorGateways) {
-                simulatorGateway.stop();
-            }
-            simulatorGateways.clear();
-        } finally {
-            lock.unlock();
-        }
-    }
+	public void disconnectSimulator() {
+		lock.lock();
+		try {
+			for (SDPGatewayNode simulatorGateway : simulatorGateways) {
+				simulatorGateway.stop();
+			}
+			simulatorGateways.clear();
+		} finally {
+			lock.unlock();
+		}
+	}
 }
