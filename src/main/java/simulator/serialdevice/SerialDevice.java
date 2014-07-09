@@ -13,8 +13,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 
-;
-
 public class SerialDevice extends BasicModule implements
         SerialPortEventListener {
     private static final int TIME_OUT = 2000;
@@ -113,5 +111,4 @@ public class SerialDevice extends BasicModule implements
     public int[] getProvidingSignals() {
         return new int[]{SIGNAL_ID};
     }
-
 }
