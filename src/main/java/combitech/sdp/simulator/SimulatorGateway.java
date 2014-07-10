@@ -65,14 +65,14 @@ public class SimulatorGateway {
 		Configuration conf = ConfigurationFactory.getConfiguration();
 
 		if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
-			System.out.println("added driver distraction node");
+//			System.out.println("added driver distraction node");
 			driverDistractionNodes.add(SCSFactory.createSCSInstance(tmpNode,
 					conf));
 		} else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
-			System.out.println("added driver hardware key node");
+//			System.out.println("added driver hardware key node");
 			hardwareKeyNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
 		} else {
-			System.out.println("added signal node");
+//			System.out.println("added signal node");
 			signalNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
 		}
 		return true;
