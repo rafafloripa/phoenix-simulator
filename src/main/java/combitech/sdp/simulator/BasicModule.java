@@ -34,8 +34,14 @@ public abstract class BasicModule implements Runnable {
     public abstract int[] getProvidingSignals();
 
     protected void provide() {
-        for (int signalID : getProvidingSignals())
+        for (int signalID : getProvidingSignals()){
             gateway.provideSignal(signalID);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     protected void unprovide() {

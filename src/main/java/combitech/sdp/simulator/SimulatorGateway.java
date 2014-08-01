@@ -10,6 +10,7 @@ import android.swedspot.sdp.observer.SDPDataListener;
 import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
+
 import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.configuration.VilConstants;
 
@@ -97,6 +98,7 @@ public class SimulatorGateway {
 				} else {
 					for (SCS node : signalNodes)
 						node.provide(signalID);
+					System.out.println("providing: "+signalID+" on signalNodes");
 				}
 			} else {
 				provideMap.put(signalID, provideMap.get(signalID) + 1);
@@ -127,7 +129,6 @@ public class SimulatorGateway {
 						for (SCS node : signalNodes)
 							node.unprovide(signalID);
 					}
-					;
 					provideMap.remove(signalID);
 				}
 			}
