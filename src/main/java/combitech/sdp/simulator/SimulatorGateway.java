@@ -66,14 +66,14 @@ public class SimulatorGateway {
 		Configuration conf = ConfigurationFactory.getConfiguration();
 
 		if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
-			System.out.println("added driver distraction node");
+			// System.out.println("added driver distraction node");
 			driverDistractionNodes.add(SCSFactory.createSCSInstance(tmpNode,
 					conf));
 		} else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
-			System.out.println("added driver hardware key node");
+			// System.out.println("added driver hardware key node");
 			hardwareKeyNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
 		} else {
-			System.out.println("added signal node");
+			// System.out.println("added signal node");
 			signalNodes.add(SCSFactory.createSCSInstance(tmpNode, conf));
 		}
 		return true;
@@ -183,15 +183,15 @@ public class SimulatorGateway {
 			if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
 				for (SCS node : driverDistractionNodes)
 					node.send(signalID, data);
-				System.out.println("sent data on driverDistractionNodes");
+				// System.out.println("sent data on driverDistractionNodes");
 			} else if (signalID == HARDWARE_KEY_ID) {
 				for (SCS node : hardwareKeyNodes)
 					node.send(signalID, data);
-				System.out.println("sent data on hardwareNodes");
+				// System.out.println("sent data on hardwareNodes");
 			} else {
 				for (SCS node : signalNodes)
 					node.send(signalID, data);
-				System.out.println("sent data on signalNodes");
+				// System.out.println("sent data on signalNodes");
 			}
 			lastValueSent.put(signalID, data);
 		} finally {
