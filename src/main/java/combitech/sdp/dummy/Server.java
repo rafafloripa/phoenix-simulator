@@ -1,16 +1,17 @@
 package combitech.sdp.dummy;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import android.swedspot.automotiveapi.AutomotiveSignal;
 import android.swedspot.automotiveapi.AutomotiveSignalInfo;
+import android.swedspot.scs.SCS;
+import android.swedspot.scs.SCSDataListener;
+import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.scs.data.Uint8;
-
+import android.swedspot.sdp.SDPFactory;
+import android.swedspot.sdp.configuration.Configuration;
+import android.swedspot.sdp.observer.SDPGatewayNode;
+import android.swedspot.sdp.observer.SDPNode;
+import android.swedspot.sdp.routing.SDPNodeEthAddress;
 import com.swedspot.automotiveapi.AutomotiveFactory;
 import com.swedspot.automotiveapi.AutomotiveListener;
 import com.swedspot.automotiveapi.AutomotiveManager;
@@ -19,18 +20,27 @@ import com.swedspot.vil.distraction.DriverDistractionLevel;
 import com.swedspot.vil.distraction.DriverDistractionListener;
 import com.swedspot.vil.policy.AutomotiveCertificate;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Server implements Runnable, DriverDistractionListener,
 		AutomotiveListener {
 	private static final int DRIVER_DISTRACTION_ID = 513;
 	private static Thread serverThread;
 	final private Lock lock;
 	private AutomotiveManager manager;
+	private SCS sendNode;
 	private boolean isRunning;
 	private volatile HashMap<Integer, LinkedList<SCSData>> receivedValues;
+	private HashMap<Integer, SCSData> sentValues;
 	private Parser dummyParser;
 
 	public Server() {
 		receivedValues = new HashMap<>();
+		sentValues = new HashMap<>();
 		lock = new ReentrantLock();
 		dummyParser = new Parser(this);
 	}
@@ -89,6 +99,34 @@ public class Server implements Runnable, DriverDistractionListener,
 	public void startServer() {
 		manager = AutomotiveFactory.createAutomotiveManagerInstance(
 				new AutomotiveCertificate(new byte[0]), this, this);
+	}
+
+	public void startSendNode() {
+		SDPNode tmpNode1 = SDPFactory.createNodeInstance();
+		SDPNode tmpNode2 = SDPFactory.createNodeInstance();
+		SDPNode tmpNode3 = SDPFactory.createNodeInstance();
+		SDPGatewayNode gatewayNode1 = SDPFactory.createGatewayServerInstance();
+		SDPGatewayNode gatewayNode2 = SDPFactory.createGatewayServerInstance();
+		SDPGatewayNode gatewayNode3 = SDPFactory.createGatewayServerInstance();
+		gatewayNode1.init(new SDPNodeEthAddress("localhost", 8251), tmpNode1);
+		gatewayNode2.init(new SDPNodeEthAddress("localhost", 9898), tmpNode2);
+		gatewayNode3.init(new SDPNodeEthAddress("localhost", 9899), tmpNode3);
+		Configuration conf = ConfigurationFactory.getConfiguration();
+		sendNode = SCSFactory.createSCSInstance(tmpNode1, conf);
+		sendNode.setDataListener(new SCSDataListener() {
+			@Override
+			public void receive(int i, SCSData scsData) {
+				System.out.println("don't send data to the send node!");
+			}
+
+			@Override
+			public SCSData request(int signalID) {
+				return sentValues.get(signalID);
+			}
+		});
+		gatewayNode1.start();
+		gatewayNode2.start();
+		gatewayNode3.start();
 	}
 
 	public void shutdownServer() {
@@ -201,10 +239,35 @@ public class Server implements Runnable, DriverDistractionListener,
 		return manager;
 	}
 
-	public void send(int signalID, SCSData data) {
+	public void sendFromManager(int signalID, SCSData data) {
 		AutomotiveSignalInfo info = new AutomotiveSignalInfo(
 				ConfigurationFactory.getConfiguration().getSignalInformation(
 						signalID));
 		manager.send(new AutomotiveSignal(signalID, data, info.getUnit()));
+		sentValues.put(signalID, data);
+	}
+
+	public void sendFromNode(int signalID, SCSData data) {
+		System.out.println("server is sending: " + signalID + " with data " + Arrays.toString(data.getData()));
+		sendNode.send(signalID, data);
+		sentValues.put(signalID, data);
+	}
+
+	public void provide(int... signalIDs) {
+		for (int id : signalIDs) {
+			sendNode.provide(id);
+			System.out.println("server is now providing signal: " + id);
+		}
+	}
+
+	public void unprovide(int... signalIDs) {
+		for (int id : signalIDs) {
+			sendNode.unprovide(id);
+			System.out.println("server no longer provides signal: " + id);
+		}
+	}
+
+	public SCS getSendNode() {
+		return sendNode;
 	}
 }
