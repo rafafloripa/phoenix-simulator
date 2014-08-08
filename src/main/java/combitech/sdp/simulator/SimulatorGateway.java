@@ -51,14 +51,7 @@ public class SimulatorGateway {
 
     public static LinkedList<Integer> collectAllIds() {
         LinkedList<Integer> tmp = new LinkedList<>();
-        Field[] fields = AutomotiveSignalId.class.getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                tmp.add(field.getInt(null));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+        tmp.addAll(ConfigurationFactory.getConfiguration().getConfiguredSignals().keySet());
         return tmp;
     }
 
