@@ -48,7 +48,7 @@ public class GXT27Module extends BasicModule {
         LOGGER.debug("Looking for controller");
         String binPath = getBinPath();
 
-        System.setProperty("net.java.games.input.librarypath", binPath + File.separator + "lib" + File.separator + "natives");
+        if (binPath != null) System.setProperty("net.java.games.input.librarypath", binPath + File.separator + "lib" + File.separator + "natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
@@ -64,7 +64,14 @@ public class GXT27Module extends BasicModule {
     }
 
     private String getBinPath() {
-        String binPath = getClass().getClassLoader().getResource(".").getPath().substring(1).replace("/", File.separator);
+        String binPath;
+        try {
+            binPath = getClass().getClassLoader().getResource(".").getPath();
+        } catch (Exception e) {
+            return null;
+        }
+
+        binPath = binPath.substring(1).replace("/", File.separator);
 
         int indexOfBuild = binPath.indexOf("build");
         if (indexOfBuild> -1) // Gradle
