@@ -46,9 +46,13 @@ public class GXT27Module extends BasicModule {
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
-        String binPath = getBinPath();
 
-        if (binPath != null) System.setProperty("net.java.games.input.librarypath", binPath + File.separator + "lib" + File.separator + "natives");
+
+        if (System.getProperty("net.java.games.input.librarypath") == null) {
+            String binPath = getBinPath();
+            if (binPath != null)
+                System.setProperty("net.java.games.input.librarypath", binPath + File.separator + "lib" + File.separator + "natives");
+        }
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
