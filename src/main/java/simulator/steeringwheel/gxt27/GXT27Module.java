@@ -11,6 +11,8 @@ import net.java.games.input.DirectAndRawInputEnvironmentPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 public class GXT27Module extends BasicModule {
     public final static int STEERING_WHEEL_ID = 514;
     private final static Logger LOGGER = LoggerFactory.getLogger(GXT27Module.class);
@@ -44,9 +46,9 @@ public class GXT27Module extends BasicModule {
 
     private Controller getController() throws Exception {
         LOGGER.debug("Looking for controller");
-        String binPath = getClass().getClassLoader().getResource(".").getPath();
-        String fixedPath = binPath.substring(0, binPath.length() - 4);
-        System.setProperty("net.java.games.input.librarypath", fixedPath + "/libs/natives");
+        String binPath = getBinPath();
+
+        System.setProperty("net.java.games.input.librarypath", binPath + File.separator + "lib" + File.separator + "natives");
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
         LOGGER.debug("Environment found");
@@ -58,6 +60,25 @@ public class GXT27Module extends BasicModule {
             }
         }
         LOGGER.debug("No controller found");
+        return null;
+    }
+
+    private String getBinPath() {
+        String binPath = getClass().getClassLoader().getResource(".").getPath().substring(1).replace("/", File.separator);
+
+        int indexOfBuild = binPath.indexOf("build");
+        if (indexOfBuild> -1) // Gradle
+        {
+            binPath = binPath.substring(0, indexOfBuild + 5);
+            return binPath;
+        }
+
+        int indexOfBin = binPath.indexOf("bin");
+        if (indexOfBin> -1) // no Gradle
+        {
+            binPath = binPath.substring(0, indexOfBin + 3);
+            return binPath;
+        }
         return null;
     }
 

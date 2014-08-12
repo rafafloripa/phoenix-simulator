@@ -6,8 +6,8 @@ apply plugin: 'jacoco'
 apply plugin: 'application'
 
 
-targetCompatibility = 1.7
-sourceCompatibility = 1.7
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
 
 version = '1.0-SNAPSHOT'
 
@@ -60,13 +60,22 @@ eclipse {
     }
 }
 
-task copyDependencies(type: Copy) {
+task copyBuildDependencies(type: Copy) {
 	from {
     	configurations.dll.filter{it.name.endsWith('windows.jar')}.collect { 
     		zipTree(it)
     	}
 	}
-	into 'libs/natives'
+    into 'build/lib/natives'
+}
+
+task copyBinDependencies(type: Copy) {
+    from {
+        configurations.dll.filter { it.name.endsWith('windows.jar') }.collect {
+            zipTree(it)
+        }
+    }
+    into 'bin/lib/natives'
 }
 
 eclipse.classpath.file {
@@ -110,7 +119,8 @@ class MyDownload extends DefaultTask {
     }
 }
 
-compileJava.dependsOn copyDependencies
+compileJava.dependsOn copyBuildDependencies
+compileJava.dependsOn copyBinDependencies
 compileJava.dependsOn downloadSDP
 compileJava.dependsOn downloadVilConfig
 compileJava.dependsOn downloadAutomotiveAPI
