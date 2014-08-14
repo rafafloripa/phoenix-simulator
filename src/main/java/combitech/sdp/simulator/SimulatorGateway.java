@@ -221,6 +221,7 @@ public class SimulatorGateway {
                 }
                 lastValueSent.put(signalID, data);
             }
+
         } finally {
             lock.unlock();
         }
@@ -263,7 +264,7 @@ public class SimulatorGateway {
                 LinkedList<SCSData> tmp = getReceivedValuesFor(signalID);
                 if (tmp != null) {
                     tmp.add(0, data);
-                    if(tmp.size() >= 11){
+                    if (tmp.size() >= 11) {
                         tmp.remove(10);
                     }
                 } else {
