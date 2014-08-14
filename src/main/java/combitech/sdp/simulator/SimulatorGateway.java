@@ -63,7 +63,13 @@ public class SimulatorGateway {
         simulatorGateway.addDataListener(new SDPDataListener() {
             @Override
             public byte[] request(int signalID) {
-                byte[] data = lastValueSent.get(signalID).getData();
+                byte[] data;
+                lock.lock();
+                try {
+                    data = lastValueSent.get(signalID).getData();
+                } finally {
+                    lock.unlock();
+                }
                 return data != null ? data : new byte[] { 0 };
             }
 
@@ -241,9 +247,11 @@ public class SimulatorGateway {
     }
 
     public void subscribeForAll(SCS node) {
+        lock.lock();
         for (Integer i : collectedIds) {
             node.subscribe(i);
         }
+        lock.unlock();
     }
 
     public void createReceiveNode(String address, int port,
@@ -258,20 +266,25 @@ public class SimulatorGateway {
         receiveNode.setDataListener(new SCSDataListener() {
             @Override
             public void receive(int signalID, SCSData data) {
-                if (listener != null) {
-                    listener.receiveData(signalID, data);
-                }
-                LinkedList<SCSData> tmp = getReceivedValuesFor(signalID);
-                if (tmp != null) {
-                    tmp.add(0, data);
-                    if (tmp.size() >= 11) {
-                        tmp.remove(10);
+                lock.lock();
+                try {
+                    if (listener != null) {
+                        listener.receiveData(signalID, data);
                     }
-                } else {
-                    tmp = new LinkedList<>();
-                    tmp.add(data);
+                    LinkedList<SCSData> tmp = getReceivedValuesFor(signalID);
+                    if (tmp != null) {
+                        tmp.add(0, data);
+                        if (tmp.size() >= 11) {
+                            tmp.remove(10);
+                        }
+                    } else {
+                        tmp = new LinkedList<>();
+                        tmp.add(data);
+                    }
+                    receivedData.put(signalID, tmp);
+                } finally {
+                    lock.unlock();
                 }
-                receivedData.put(signalID, tmp);
             }
 
             @Override
