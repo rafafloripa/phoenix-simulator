@@ -1,5 +1,6 @@
 Feature: GXT27 steering wheel signal sending 
 
+  @shutdownNode
   Scenario: Send steering wheel data from the GXT27 to the dummy application
     Given The simulator is setup
     And The dummy application is setup and listening on port 8251

@@ -12,6 +12,7 @@ import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
+
 import com.swedspot.automotiveapi.AutomotiveFactory;
 import com.swedspot.automotiveapi.AutomotiveListener;
 import com.swedspot.automotiveapi.AutomotiveManager;
@@ -23,6 +24,7 @@ import com.swedspot.vil.policy.AutomotiveCertificate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -115,8 +117,12 @@ public class Server implements Runnable, DriverDistractionListener,
 		sendNode = SCSFactory.createSCSInstance(tmpNode1, conf);
 		sendNode.setDataListener(new SCSDataListener() {
 			@Override
-			public void receive(int i, SCSData scsData) {
-				System.out.println("don't send data to the send node!");
+			public void receive(int signalID, SCSData scsData) {
+				SCSData data = sentValues.get(signalID);
+				if (data == null || !data.getData().equals(scsData.getData())) {
+					System.out.println("got data from: " + signalID);
+					
+				}
 			}
 
 			@Override
@@ -248,7 +254,8 @@ public class Server implements Runnable, DriverDistractionListener,
 	}
 
 	public void sendFromNode(int signalID, SCSData data) {
-		System.out.println("server is sending: " + signalID + " with data " + Arrays.toString(data.getData()));
+		System.out.println("server is sending: " + signalID + " with data "
+				+ Arrays.toString(data.getData()));
 		sendNode.send(signalID, data);
 		sentValues.put(signalID, data);
 	}

@@ -15,7 +15,7 @@ public class Parser {
 	public final String SEND_ON_NODE = "nodeSend";
 	public final String PROVIDE_ON_NODE = "nodeProvide";
 	public final String UNPROVIDE_ON_NODE = "nodeUnprovide";
-	public final String SEND_ON_MANAGER = "managerSend";
+	public final String SEND_ON_MANAGER = "send";
 	public final String EXIT = "exit";
 
 	private Server server;
