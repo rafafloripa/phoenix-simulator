@@ -119,8 +119,8 @@ public class SimulatorGateway {
                     for (SCS node : signalNodes) {
                         node.provide(signalID);
                     }
-                    System.out.println("providing: " + signalID
-                            + " on signalNodes");
+                    //System.out.println("providing: " + signalID
+                    //        + " on signalNodes");
                 }
                 if (receiveNode != null) {
                     receiveNode.unsubscribe(signalID);

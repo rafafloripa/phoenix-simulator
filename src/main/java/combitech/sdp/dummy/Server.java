@@ -212,7 +212,7 @@ public class Server implements Runnable, DriverDistractionListener,
 	}
 
 	public void start() {
-		serverThread = new Thread(this);
+		serverThread = new Thread(this, "SDP Server Thread");
 		isRunning = true;
 		serverThread.start();
 	}
