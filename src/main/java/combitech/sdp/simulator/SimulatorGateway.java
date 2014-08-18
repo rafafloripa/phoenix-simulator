@@ -54,7 +54,7 @@ public class SimulatorGateway {
     }
 
     public boolean addAndInitiateNode(String address, int port,
-            SDPConnectionListener connectionListener) {
+                                      SDPConnectionListener connectionListener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
@@ -70,7 +70,7 @@ public class SimulatorGateway {
                 } finally {
                     lock.unlock();
                 }
-                return data != null ? data : new byte[] { 0 };
+                return data != null ? data : new byte[]{0};
             }
 
             @Override
@@ -110,17 +110,17 @@ public class SimulatorGateway {
                 if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.provide(signalID);
-                        System.out.println("Providing signal " + signalID  + " on driver distraction node");
+                        System.out.println("Providing signal " + signalID + " on driver distraction node");
                     }
                 } else if (signalID == HARDWARE_KEY_ID) {
                     for (SCS node : hardwareKeyNodes) {
                         node.provide(signalID);
-                        System.out.println("Providing signal " + signalID  + " on hardware node");
+                        System.out.println("Providing signal " + signalID + " on hardware node");
                     }
                 } else {
                     for (SCS node : signalNodes) {
                         node.provide(signalID);
-                        System.out.println("Providing signal " + signalID  + " on data node");
+                        System.out.println("Providing signal " + signalID + " on data node");
                     }
                     //System.out.println("providing: " + signalID
                     //        + " on signalNodes");
@@ -214,18 +214,19 @@ public class SimulatorGateway {
     public void sendValue(int signalID, SCSData data) {
         lock.lock();
         try {
-            if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
-                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
-                    for (SCS node : driverDistractionNodes) {
-                        node.send(signalID, data);
-                    }
-                } else if (signalID == HARDWARE_KEY_ID) {
-                    for (SCS node : hardwareKeyNodes) {
-                        node.send(signalID, data);
-                    }
-                } else {
-                    for (SCS node : signalNodes) {
-                        node.send(signalID, data);
+            if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+                for (SCS node : driverDistractionNodes) {
+                    node.send(signalID, data);
+                }
+                if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
+                    if (signalID == HARDWARE_KEY_ID) {
+                        for (SCS node : hardwareKeyNodes) {
+                            node.send(signalID, data);
+                        }
+                    } else {
+                        for (SCS node : signalNodes) {
+                            node.send(signalID, data);
+                        }
                     }
                 }
                 lastValueSent.put(signalID, data);
@@ -258,7 +259,7 @@ public class SimulatorGateway {
     }
 
     public void createReceiveNode(String address, int port,
-            final ReceiveListener listener) {
+                                  final ReceiveListener listener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode receiveGateway = SDPFactory
                 .createGatewayClientInstance();
