@@ -225,16 +225,17 @@ public class SimulatorGateway {
      */
     public void sendValue(int signalID, SCSData data) {
         lock.lock();
+        System.out.println("sending data");
         try {
-            if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
-                for (SCS node : driverDistractionNodes) {
+            if (signalID == HARDWARE_KEY_ID) {
+                for (SCS node : hardwareKeyNodes) {
                     node.send(signalID, data);
                     System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
                 }
             }
             if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
-                if (signalID == HARDWARE_KEY_ID) {
-                    for (SCS node : hardwareKeyNodes) {
+                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+                    for (SCS node : driverDistractionNodes) {
                         node.send(signalID, data);
                     }
                 } else {
