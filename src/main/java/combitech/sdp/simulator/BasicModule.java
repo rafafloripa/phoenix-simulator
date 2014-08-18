@@ -1,5 +1,7 @@
 package combitech.sdp.simulator;
 
+import java.util.Arrays;
+
 public abstract class BasicModule implements Runnable {
 
     protected SimulatorGateway gateway;
@@ -37,6 +39,7 @@ public abstract class BasicModule implements Runnable {
         for (int signalID : getProvidingSignals()){
             gateway.provideSignal(signalID);
         }
+        System.out.println("GXT27 Steering Wheel module is providing " + Arrays.toString(getProvidingSignals()));
     }
 
     protected void unprovide() {
