@@ -55,9 +55,9 @@ public class Torcs extends BasicModule {
 
             Socket clientSocket;
             try {
-                System.out.println("Awaiting connection");
+                // System.out.println("Awaiting connection");
                 clientSocket = welcomeSocket.accept();
-                System.out.println("Got connection");
+                // System.out.println("Got connection");
 
                 BufferedReader inFromTorcs = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));

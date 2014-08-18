@@ -114,7 +114,7 @@ public class SimulatorGateway {
      * @param signalID
      */
     public void provideSignal(int signalID) {
-        System.out.println("SimulatorGateway is providing signal; " + signalID);
+        // System.out.println("SimulatorGateway is providing signal; " + signalID);
         lock.lock();
         try {
             if (!provideMap.containsKey(signalID)) {
@@ -122,17 +122,17 @@ public class SimulatorGateway {
                 if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.provide(signalID);
-                        System.out.println("Providing signal " + signalID + " on driver distraction node");
+                        // System.out.println("Providing signal " + signalID + " on driver distraction node");
                     }
                 } else if (signalID == HARDWARE_KEY_ID) {
                     for (SCS node : hardwareKeyNodes) {
                         node.provide(signalID);
-                        System.out.println("Providing signal " + signalID + " on hardware node");
+                        // System.out.println("Providing signal " + signalID + " on hardware node");
                     }
                 } else {
                     for (SCS node : signalNodes) {
                         node.provide(signalID);
-                        System.out.println("Providing signal " + signalID + " on data node");
+                        // System.out.println("Providing signal " + signalID + " on data node");
                     }
                     //System.out.println("providing: " + signalID
                     //        + " on signalNodes");
@@ -225,12 +225,12 @@ public class SimulatorGateway {
      */
     public void sendValue(int signalID, SCSData data) {
         lock.lock();
-        System.out.println("sending data");
+        // System.out.println("sending data");
         try {
             if (signalID == HARDWARE_KEY_ID) {
                 for (SCS node : hardwareKeyNodes) {
                     node.send(signalID, data);
-                    System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
+                    // System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
                 }
             }
             if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {

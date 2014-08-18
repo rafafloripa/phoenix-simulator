@@ -30,13 +30,13 @@ public class SerialDevice extends BasicModule implements
     public void run() {
         getModuleThread().setName("SerialDevice");
         if (portId == null) {
-            System.out.println("Could not find COM port.");
+            // System.out.println("Could not find COM port.");
             return;
         }
 
         if (state == SimulationModuleState.STOPPED)
             return;
-        System.out.println("Reading from port " + portId.getName());
+        // System.out.println("Reading from port " + portId.getName());
 
         try {
             serialPort = (SerialPort) portId.open(this.getClass().getName(),
@@ -97,7 +97,7 @@ public class SerialDevice extends BasicModule implements
                 int data;
                 if (input.ready()) {
                     data = Integer.parseInt(input.readLine());
-                    System.out.println(data);
+                    // System.out.println(data);
                     gateway.sendValue(SIGNAL_ID, new Uint16(data));
                 }
 

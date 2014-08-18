@@ -38,7 +38,7 @@ public abstract class BasicModule implements Runnable {
     protected void provide() {
         for (int signalID : getProvidingSignals()) {
             gateway.provideSignal(signalID);
-            System.out.println("GXT27 Steering Wheel module is providing " + Arrays.toString(getProvidingSignals()));
+            // System.out.println("GXT27 Steering Wheel module is providing " + Arrays.toString(getProvidingSignals()));
         }
     }
 

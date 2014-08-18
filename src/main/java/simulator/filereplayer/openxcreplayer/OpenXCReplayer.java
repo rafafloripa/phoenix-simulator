@@ -112,7 +112,7 @@ public class OpenXCReplayer extends BasicModule {
                     }
 
                     SCSData data = convertToSCSData(extractName(newLine), extractValue(newLine));
-                    System.out.println("sending id: " + id + " with value: " + extractValue(newLine));
+                    // System.out.println("sending id: " + id + " with value: " + extractValue(newLine));
                     gateway.sendValue(id, data);
                 }
             }
@@ -240,7 +240,7 @@ public class OpenXCReplayer extends BasicModule {
         int[] tmp = new int[availableIDs.size()];
         for (int i = 0; i < tmp.length; i++) {
             tmp[i] = availableIDs.get(i).intValue();
-            LOGGER.debug("returning: " + tmp[i]);
+            // LOGGER.debug("returning: " + tmp[i]);
         }
         return tmp;
     }

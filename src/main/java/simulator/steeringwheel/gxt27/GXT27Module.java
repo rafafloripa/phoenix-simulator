@@ -29,7 +29,7 @@ public class GXT27Module extends BasicModule {
         getModuleThread().setName("GXT27Module");
         initDevice();
         if (controller == null) {
-            LOGGER.debug("Could not find the Trust GXT 27 steering wheel");
+            // LOGGER.debug("Could not find the Trust GXT 27 steering wheel");
             return;
         }
 
@@ -45,7 +45,7 @@ public class GXT27Module extends BasicModule {
     }
 
     private Controller getController() throws Exception {
-        LOGGER.debug("Looking for controller");
+        // LOGGER.debug("Looking for controller");
 
 
         if (System.getProperty("net.java.games.input.librarypath") == null) {
@@ -55,15 +55,15 @@ public class GXT27Module extends BasicModule {
         }
         DirectAndRawInputEnvironmentPlugin env = new DirectAndRawInputEnvironmentPlugin();
         Controller[] controllers = env.getControllers();
-        LOGGER.debug("Environment found");
+        // LOGGER.debug("Environment found");
         for (Controller cont : controllers) {
-            LOGGER.debug("Controller: " + cont.getName());
+            // LOGGER.debug("Controller: " + cont.getName());
             if (cont.getName().equals("Steering Wheel")) {
-                LOGGER.debug("Found Controller");
+                // LOGGER.debug("Found Controller");
                 return cont;
             }
         }
-        LOGGER.debug("No controller found");
+        // LOGGER.debug("No controller found");
         return null;
     }
 
@@ -97,7 +97,7 @@ public class GXT27Module extends BasicModule {
         try {
             controller = getController();
         } catch (Exception e) {
-            LOGGER.debug("Exception with" + e.getLocalizedMessage());
+            // LOGGER.debug("Exception with" + e.getLocalizedMessage());
             e.printStackTrace();
         }
         model = new ControllerModel();
@@ -110,7 +110,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.home = true;
             } else if (model.home) {
-                LOGGER.debug("home");
+                // LOGGER.debug("home");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 0));
                 model.home = false;
             }
@@ -119,7 +119,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.app = true;
             } else if (model.app) {
-                LOGGER.debug("app");
+                // LOGGER.debug("app");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 1));
                 model.app = false;
             }
@@ -128,7 +128,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.enter = true;
             } else if (model.enter) {
-                LOGGER.debug("enter");
+                // LOGGER.debug("enter");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 2));
                 model.enter = false;
             }
@@ -137,7 +137,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.back = true;
             } else if (model.back) {
-                LOGGER.debug("back");
+                // LOGGER.debug("back");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 3));
                 model.back = false;
             }
@@ -158,19 +158,19 @@ public class GXT27Module extends BasicModule {
                     model.left = true;
                 }
             } else if (model.up) {
-                LOGGER.debug("up");
+                // LOGGER.debug("up");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 4));
                 model.up = false;
             } else if (model.right) {
-                LOGGER.debug("right");
+                // LOGGER.debug("right");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 5));
                 model.right = false;
             } else if (model.down) {
-                LOGGER.debug("down");
+                // LOGGER.debug("down");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 6));
                 model.down = false;
             } else if (model.left) {
-                LOGGER.debug("left");
+                // LOGGER.debug("left");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 7));
                 model.left = false;
             }
@@ -179,7 +179,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.plus = true;
             } else if (model.plus) {
-                LOGGER.debug("plus");
+                // LOGGER.debug("plus");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 8));
                 model.plus = false;
             }
@@ -188,7 +188,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.minus = true;
             } else if (model.minus) {
-                LOGGER.debug("minus");
+                // LOGGER.debug("minus");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 9));
                 model.minus = false;
             }
@@ -197,7 +197,7 @@ public class GXT27Module extends BasicModule {
             if (com.getPollData() > 0) {
                 model.power = true;
             } else if (model.power) {
-                LOGGER.debug("power");
+                // LOGGER.debug("power");
                 gateway.sendValue(STEERING_WHEEL_ID, new Uint32(1 << 10));
                 model.power = false;
             }
