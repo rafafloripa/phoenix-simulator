@@ -5,9 +5,13 @@ import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.SCSStatusListener;
 import android.swedspot.scs.data.SCSData;
+import android.swedspot.scs.data.Uint32;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
-import android.swedspot.sdp.observer.*;
+import android.swedspot.sdp.observer.SDPConnectionListener;
+import android.swedspot.sdp.observer.SDPDataListener;
+import android.swedspot.sdp.observer.SDPGatewayNode;
+import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
 import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.configuration.VilConstants;
@@ -50,6 +54,7 @@ public class SimulatorGateway {
                 .getConfiguredSignals().keySet());
         return tmp;
     }
+
     public boolean addAndInitiateNode(String address, int port,
                                       SDPConnectionListener connectionListener, SCSStatusListener statusListener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
@@ -83,7 +88,7 @@ public class SimulatorGateway {
         Configuration conf = ConfigurationFactory.getConfiguration();
 
         SCS node = SCSFactory.createSCSInstance(tmpNode, conf);
-        if(statusListener != null){
+        if (statusListener != null) {
             node.setStatusListener(statusListener);
         }
 
@@ -109,6 +114,7 @@ public class SimulatorGateway {
      * @param signalID
      */
     public void provideSignal(int signalID) {
+        System.out.println("SimulatorGateway is providing signal; " + signalID);
         lock.lock();
         try {
             if (!provideMap.containsKey(signalID)) {
@@ -223,6 +229,7 @@ public class SimulatorGateway {
             if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                 for (SCS node : driverDistractionNodes) {
                     node.send(signalID, data);
+                    System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
                 }
             }
             if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {

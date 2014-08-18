@@ -36,10 +36,10 @@ public abstract class BasicModule implements Runnable {
     public abstract int[] getProvidingSignals();
 
     protected void provide() {
-        for (int signalID : getProvidingSignals()){
+        for (int signalID : getProvidingSignals()) {
             gateway.provideSignal(signalID);
+            System.out.println("GXT27 Steering Wheel module is providing " + Arrays.toString(getProvidingSignals()));
         }
-        System.out.println("GXT27 Steering Wheel module is providing " + Arrays.toString(getProvidingSignals()));
     }
 
     protected void unprovide() {
