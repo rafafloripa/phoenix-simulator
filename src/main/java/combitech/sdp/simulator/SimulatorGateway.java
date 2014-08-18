@@ -3,13 +3,11 @@ package combitech.sdp.simulator;
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
+import android.swedspot.scs.SCSStatusListener;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
-import android.swedspot.sdp.observer.SDPConnectionListener;
-import android.swedspot.sdp.observer.SDPDataListener;
-import android.swedspot.sdp.observer.SDPGatewayNode;
-import android.swedspot.sdp.observer.SDPNode;
+import android.swedspot.sdp.observer.*;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
 import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.configuration.VilConstants;
@@ -52,9 +50,8 @@ public class SimulatorGateway {
                 .getConfiguredSignals().keySet());
         return tmp;
     }
-
     public boolean addAndInitiateNode(String address, int port,
-                                      SDPConnectionListener connectionListener) {
+                                      SDPConnectionListener connectionListener, SCSStatusListener statusListener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
@@ -86,6 +83,10 @@ public class SimulatorGateway {
         Configuration conf = ConfigurationFactory.getConfiguration();
 
         SCS node = SCSFactory.createSCSInstance(tmpNode, conf);
+        if(statusListener != null){
+            node.setStatusListener(statusListener);
+        }
+
         if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
             driverDistractionNodes.add(node);
         } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
@@ -95,6 +96,11 @@ public class SimulatorGateway {
         }
 
         return true;
+    }
+
+    public boolean addAndInitiateNode(String address, int port,
+                                      SDPConnectionListener connectionListener) {
+        return addAndInitiateNode(address, port, connectionListener, null);
     }
 
     /**
@@ -218,19 +224,19 @@ public class SimulatorGateway {
                 for (SCS node : driverDistractionNodes) {
                     node.send(signalID, data);
                 }
-                if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
-                    if (signalID == HARDWARE_KEY_ID) {
-                        for (SCS node : hardwareKeyNodes) {
-                            node.send(signalID, data);
-                        }
-                    } else {
-                        for (SCS node : signalNodes) {
-                            node.send(signalID, data);
-                        }
+            }
+            if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
+                if (signalID == HARDWARE_KEY_ID) {
+                    for (SCS node : hardwareKeyNodes) {
+                        node.send(signalID, data);
+                    }
+                } else {
+                    for (SCS node : signalNodes) {
+                        node.send(signalID, data);
                     }
                 }
-                lastValueSent.put(signalID, data);
             }
+            lastValueSent.put(signalID, data);
 
         } finally {
             lock.unlock();

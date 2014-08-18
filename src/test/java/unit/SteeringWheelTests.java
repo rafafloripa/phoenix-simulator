@@ -1,7 +1,8 @@
 package unit;
 
-import acceptancetest.util.Util;
 import android.swedspot.scs.data.Uint32;
+import android.swedspot.sdp.ConnectionStatus;
+import android.swedspot.sdp.SubscriptionStatus;
 import com.swedspot.vil.keys.HardwareButtonController;
 import com.swedspot.vil.keys.HardwareButtonControllerFactory;
 import com.swedspot.vil.keys.HardwareButtonListener;
@@ -11,8 +12,10 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static acceptancetest.util.Util.staticSimulator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by nine on 8/13/14.
@@ -20,20 +23,30 @@ import static org.junit.Assert.assertNotNull;
 public class SteeringWheelTests {
 
     @Test
-    public void testSendDataToService() throws InterruptedException {
+    public void sendDataToServiceTest() throws InterruptedException {
         // ACT I:
         System.out.println("initializing local variables");
         final int signalID = 514;
         final Uint32 sendData = new Uint32(1);
         final String expectedValue = Key.HOME.name();
         final ArrayList<Key> receiveList = new ArrayList<Key>();
-        Util.staticSimulator = new SimulatorGateway();
-        Thread.sleep(2000);
-        Util.staticSimulator.addAndInitiateNode("localhost", 9899, null);
-        Thread.sleep(2000);
+        staticSimulator = new SimulatorGateway();
 
         HardwareButtonController server = HardwareButtonControllerFactory.getInstance();
-        Thread.sleep(2000);
+        Thread testNodeThread = new Thread(() -> staticSimulator.addAndInitiateNode("localhost", 9899, connectionStatus -> {
+            if (connectionStatus == ConnectionStatus.CONNECTED)
+                synchronized (this) {
+                    notifyAll();
+                }
+        }, (id ,subscriptionStatus) -> {
+            if(subscriptionStatus == SubscriptionStatus.SUBSCRIBED){
+                synchronized (this){
+                    notifyAll();
+                }
+            }
+        }),"Test Node Thread");
+
+
         server.addListener(new HardwareButtonListener() {
             @Override public void onPressed(Key key) {
                 System.out.println("Server got key: " + key.ordinal() + " named " + key.name());
@@ -46,12 +59,18 @@ public class SteeringWheelTests {
             }
         });
 
+        testNodeThread.start();
+
+        synchronized(testNodeThread) {
+            testNodeThread.wait(6000);
+        }
         // ACT II:
         System.out.println("Providing and sending data");
-        Util.staticSimulator.provideSignal(signalID);
-
-        Thread.sleep(2000);
-        Util.staticSimulator.sendValue(signalID, sendData);
+        staticSimulator.provideSignal(signalID);
+        synchronized(testNodeThread) {
+            testNodeThread.wait(6000);
+        }
+        staticSimulator.sendValue(signalID, sendData);
         Thread.sleep(2000);
 
         // ACT III:
