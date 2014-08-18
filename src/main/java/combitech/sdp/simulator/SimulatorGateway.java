@@ -110,14 +110,17 @@ public class SimulatorGateway {
                 if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.provide(signalID);
+                        System.out.println("Providing signal " + signalID  + "on driver distraction node");
                     }
                 } else if (signalID == HARDWARE_KEY_ID) {
                     for (SCS node : hardwareKeyNodes) {
                         node.provide(signalID);
+                        System.out.println("Providing signal " + signalID  + "on hardware node");
                     }
                 } else {
                     for (SCS node : signalNodes) {
                         node.provide(signalID);
+                        System.out.println("Providing signal " + signalID  + "on data node");
                     }
                     //System.out.println("providing: " + signalID
                     //        + " on signalNodes");
