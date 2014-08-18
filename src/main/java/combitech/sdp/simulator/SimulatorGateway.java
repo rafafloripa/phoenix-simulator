@@ -317,4 +317,8 @@ public class SimulatorGateway {
     public LinkedList<SCSData> getReceivedValuesFor(int signalID) {
         return receivedData.get(signalID);
     }
+
+    public SCSData getLastSentValueFor(int signalID){
+        return lastValueSent.get(signalID);
+    }
 }
