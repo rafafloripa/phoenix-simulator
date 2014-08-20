@@ -10,29 +10,29 @@ import cucumber.api.java.en.Then;
 
 import java.util.LinkedList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static acceptancetest.util.Util.*;
+import static org.junit.Assert.*;
 
 public class CommonSteps {
 
     @After("@shutdownNode")
     public void shutdownNodeStep() {
         try {
-            if (Util.staticSimulator != null) {
-                Util.staticSimulator.disconnectSimulator();
-                Util.staticSimulator = null;
+            if (staticSimulator != null) {
+                staticSimulator.disconnectSimulator();
+                staticSimulator = null;
             }
-            if (Util.staticDummyApp != null) {
-                Util.staticDummyApp.stop();
-                Util.staticDummyApp = null;
+            if (staticDummyApp != null) {
+                staticDummyApp.stop();
+                staticDummyApp = null;
             }
-            if (Util.staticServer != null) {
-                Util.staticServer.shutdownServer();
-                Util.staticServer = null;
+            if (staticServer != null) {
+                staticServer.shutdownServer();
+                staticServer = null;
             }
-            if(Util.staticModule != null){
-                Util.staticModule.stopModule();
-                Util.staticModule = null;
+            if (staticModule != null) {
+                staticModule.stopModule();
+                staticModule = null;
             }
             Thread.sleep(3000);
         } catch (Exception e) {
@@ -42,17 +42,17 @@ public class CommonSteps {
 
     @Given("^The simulator is setup$")
     public void setupSimulator() throws Throwable {
-        Util.staticSimulator = new SimulatorGateway();
+        staticSimulator = new SimulatorGateway();
     }
 
     @Given("^The simulator is providing signal id (\\d+)$")
     public void simulatorProvidesSignal(int signalID) {
-        Util.staticSimulator.provideSignal(signalID);
+        staticSimulator.provideSignal(signalID);
     }
 
     @Given("^Add a node to simulator on port (\\d+) and ip (.*)$")
     public void addNode(int port, String ipAddress) {
-        Util.staticSimulator.addAndInitiateNode(ipAddress, port, null);
+        staticSimulator.addAndInitiateNode(ipAddress, port, null);
     }
 
     @And("^After (\\d+) mSec have passed$")
@@ -62,25 +62,23 @@ public class CommonSteps {
 
     @Given("^The dummy application is setup and listening on port (\\d+)$")
     public void the_dummy_application_is_setup_and_listening_on_port(int port) throws Throwable {
-        Util.staticDummyApp = new DummyApplication(port);
+        staticDummyApp = new DummyApplication(port);
     }
 
     @Given("^The dummy application subscribes for signal id (\\d+)$")
     public void dummyAppSubscribe(int signalID) {
-        Util.staticDummyApp.subscribe(signalID);
+        staticDummyApp.subscribe(signalID);
     }
 
-    @Given("^The dummy server is setup$")
-    public void dummyServerSetup() {
-        Util.staticServer = new Server();
-        Util.staticServer.startServer();
-        Util.staticServer.start();
+    @And("^The server subscribes for (\\d+)$")
+    public void serverSubscribe(int signalID){
+        staticServer.subscribe(new String[]{String.valueOf(signalID)});
     }
 
     @Then("^The simulator should have received (\\d+) from signal id (\\d+) as a (.*)$")
     public void simulatorHasReceived(int value, int signalID, String t) {
         String type = t.toLowerCase();
-        LinkedList<SCSData> data = Util.staticSimulator.getReceivedValuesFor(signalID);
+        LinkedList<SCSData> data = staticSimulator.getReceivedValuesFor(signalID);
         assertNotNull(data);
 
         switch (type) {
@@ -111,8 +109,77 @@ public class CommonSteps {
         }
     }
 
-    @And("^The simulator is ready to receive data from address (.*) and port (\\d+)$")
-    public void simulatorCreateReceiveNode(String address, int port) {
-        Util.staticSimulator.createReceiveNode(address, port, null);
+    @And("^The simulator sends signal (\\d+) as a (.*) with the value (\\d+)$")
+    public void simulatorSendsData(int signalID, String t, int value) {
+        String type = t.toLowerCase();
+        SCSData data = null;
+
+        switch (type) {
+        case "integer":
+            data = new SCSInteger(value);
+            break;
+        case "float":
+            data = new SCSFloat(value);
+            break;
+        case "uint32":
+            data = new Uint32(value);
+            break;
+        case "uint16":
+            data = new Uint16(value);
+            break;
+        case "uint8":
+            data = new Uint8(value);
+            break;
+        case "double":
+            data = new SCSDouble(value);
+            break;
+        default:
+            fail();
+        }
+        staticSimulator.sendValue(signalID, data);
     }
+
+    @And("^The simulator disconnects$")
+    public void simulatorDisconnects() {
+        staticSimulator.disconnectSimulator();
+        staticSimulator = null;
+    }
+
+    @And("^The server should have received (\\d+) from signal id (\\d+) as a (.*)$")
+    public void serverHasReceived(int value, int signalID, String t) {
+        String type = t.toLowerCase();
+        SCSData data = null;
+
+        switch (type) {
+        case "integer":
+            data = new SCSInteger(value);
+            break;
+        case "float":
+            data = new SCSFloat(value);
+            break;
+        case "uint32":
+            data = new Uint32(value);
+            break;
+        case "uint16":
+            data = new Uint16(value);
+            break;
+        case "uint8":
+            data = new Uint8(value);
+            break;
+        case "double":
+            data = new SCSDouble(value);
+            break;
+        default:
+            fail("not a valid type! Check your spelling");
+        }
+        assertTrue(staticServer.didReceiveValue(signalID, data));
+    }
+
+    @Given("^The dummy server is setup$")
+    public void dummyServerSetup() {
+        staticServer = new Server();
+        staticServer.startServer();
+        staticServer.start();
+    }
+
 }

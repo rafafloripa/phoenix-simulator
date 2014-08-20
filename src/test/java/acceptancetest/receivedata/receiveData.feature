@@ -10,8 +10,6 @@ Feature: subscribing for a signal
     And After 2000 mSec have passed
     And Add a node to simulator on port 8251 and ip localhost
     And After 2000 mSec have passed
-    And The simulator is ready to receive data from address localhost and port 8251
-    And After 2000 mSec have passed
     And The dummy server sends the signal 320 with the value 10 as a float
     And After 2000 mSec have passed
     Then The simulator should have received 10 from signal id 320 as a float

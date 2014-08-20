@@ -5,7 +5,7 @@ import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.SCSStatusListener;
 import android.swedspot.scs.data.SCSData;
-import android.swedspot.scs.data.Uint32;
+import android.swedspot.sdp.ConnectionStatus;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPConnectionListener;
@@ -24,7 +24,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SimulatorGateway {
     private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
     private static final int HARDWARE_KEY_ID = 514;
-
     private HashMap<Integer, Integer> provideMap;
     private HashMap<Integer, SCSData> lastValueSent;
     private LinkedList<SDPGatewayNode> simulatorGateways;
@@ -32,9 +31,10 @@ public class SimulatorGateway {
     private LinkedList<SCS> hardwareKeyNodes;
     private LinkedList<SCS> signalNodes;
     private HashMap<Integer, LinkedList<SCSData>> receivedData;
-    private SCS receiveNode;
     private LinkedList<Integer> collectedIds;
     private ReentrantLock lock;
+    private Thread countdownThread;
+    private boolean isConnected = false;
 
     public SimulatorGateway() {
         simulatorGateways = new LinkedList<>();
@@ -55,56 +55,124 @@ public class SimulatorGateway {
         return tmp;
     }
 
+    private void gotConnected() {
+        isConnected = true;
+    }
+
+    private void notConnected() {
+        isConnected = false;
+        lock.lock();
+        try {
+            for (SDPGatewayNode node : simulatorGateways) {
+                node.stop();
+            }
+            simulatorGateways.clear();
+        } finally {
+            lock.unlock();
+        }
+        countdownThread = null;
+    }
+
+    public void startCountdown() {
+        lock.lock();
+        try {
+            if (countdownThread == null) {
+                countdownThread = new Thread(() -> {
+                    int i = 8;
+                    do {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                        }
+                        i--;
+                    } while (!isConnected && i != 0);
+                    if (!isConnected) {
+                        notConnected();
+                    }
+                });
+                countdownThread.start();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public boolean addAndInitiateNode(String address, int port,
-                                      SDPConnectionListener connectionListener, SCSStatusListener statusListener) {
+            SDPConnectionListener connectionListener, SCSStatusListener statusListener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
-
         simulatorGateway.init(new SDPNodeEthAddress(address, port), tmpNode);
-        simulatorGateway.addDataListener(new SDPDataListener() {
-            @Override
-            public byte[] request(int signalID) {
-                byte[] data;
-                lock.lock();
-                try {
-                    data = lastValueSent.get(signalID).getData();
-                } finally {
-                    lock.unlock();
-                }
-                return data != null ? data : new byte[]{0};
-            }
-
-            @Override
-            public void receive(int signalID, byte[] data) {
-            }
-        });
         if (connectionListener != null) {
-            simulatorGateway.setConnectionListener(connectionListener);
+            simulatorGateway.setConnectionListener(status -> {
+                if (connectionListener != null) {
+                    connectionListener.connectionStatusChanged(status);
+                }
+                if (status == ConnectionStatus.CONNECTED) {
+                    gotConnected();
+                }
+                if (status == ConnectionStatus.DISCONNECTED) {
+                    notConnected();
+                }
+            });
         }
-        simulatorGateway.start();
 
-        simulatorGateways.add(simulatorGateway);
+        simulatorGateway.start();
         Configuration conf = ConfigurationFactory.getConfiguration();
 
-        SCS node = SCSFactory.createSCSInstance(tmpNode, conf);
-        if (statusListener != null) {
-            node.setStatusListener(statusListener);
-        }
+        lock.lock();
+        try {
+            simulatorGateways.add(simulatorGateway);
 
-        if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
-            driverDistractionNodes.add(node);
-        } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
-            hardwareKeyNodes.add(node);
-        } else {
-            signalNodes.add(node);
-        }
+            SCS node = SCSFactory.createSCSInstance(tmpNode, conf);
+            node.setDataListener(new SCSDataListener() {
+                @Override public void receive(int signalID, SCSData data) {
+                    lock.lock();
+                    try {
+                        LinkedList<SCSData> dataList = receivedData.get(signalID);
+                        if(dataList != null){
+                            dataList.add(data);
+                        } else {
+                            dataList = new LinkedList<>();
+                            dataList.add(data);
+                            receivedData.put(signalID,dataList);
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+                }
 
+                @Override public SCSData request(int signalID) {
+                    SCSData data = null;
+                    lock.lock();
+                    try {
+                        data = lastValueSent.get(signalID);
+                    } finally {
+                        lock.unlock();
+                    }
+                    return data;
+                }
+            });
+            if (statusListener != null) {
+                node.setStatusListener(statusListener);
+            }
+
+            if (port == VilConstants.DRIVER_DISTRACTION_PORT) {
+                driverDistractionNodes.add(node);
+            } else if (port == VilConstants.HARDWARE_BUTTON_PORT) {
+                hardwareKeyNodes.add(node);
+            } else {
+                subscribeForAll(node);
+                signalNodes.add(node);
+            }
+        } finally {
+            lock.unlock();
+        }
         return true;
     }
 
     public boolean addAndInitiateNode(String address, int port,
-                                      SDPConnectionListener connectionListener) {
+            SDPConnectionListener connectionListener) {
         return addAndInitiateNode(address, port, connectionListener, null);
     }
 
@@ -121,24 +189,24 @@ public class SimulatorGateway {
                 provideMap.put(signalID, 1);
                 if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
+                        node.unsubscribe(signalID);
                         node.provide(signalID);
                         // System.out.println("Providing signal " + signalID + " on driver distraction node");
                     }
                 } else if (signalID == HARDWARE_KEY_ID) {
                     for (SCS node : hardwareKeyNodes) {
+                        node.unsubscribe(signalID);
                         node.provide(signalID);
                         // System.out.println("Providing signal " + signalID + " on hardware node");
                     }
                 } else {
                     for (SCS node : signalNodes) {
+                        node.unsubscribe(signalID);
                         node.provide(signalID);
                         // System.out.println("Providing signal " + signalID + " on data node");
                     }
                     //System.out.println("providing: " + signalID
                     //        + " on signalNodes");
-                }
-                if (receiveNode != null) {
-                    receiveNode.unsubscribe(signalID);
                 }
             } else {
                 provideMap.put(signalID, provideMap.get(signalID) + 1);
@@ -162,20 +230,20 @@ public class SimulatorGateway {
                     if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
                         for (SCS node : driverDistractionNodes) {
                             node.unprovide(signalID);
+                            node.subscribe(signalID);
                         }
                     } else if (signalID == HARDWARE_KEY_ID) {
                         for (SCS node : hardwareKeyNodes) {
                             node.unprovide(signalID);
+                            node.subscribe(signalID);
                         }
                     } else {
                         for (SCS node : signalNodes) {
                             node.unprovide(signalID);
+                            node.subscribe(signalID);
                         }
                     }
                     provideMap.remove(signalID);
-                    if (receiveNode != null) {
-                        receiveNode.subscribe(signalID);
-                    }
                 }
             }
         } finally {
@@ -272,53 +340,11 @@ public class SimulatorGateway {
         lock.unlock();
     }
 
-    public void createReceiveNode(String address, int port,
-                                  final ReceiveListener listener) {
-        SDPNode tmpNode = SDPFactory.createNodeInstance();
-        SDPGatewayNode receiveGateway = SDPFactory
-                .createGatewayClientInstance();
-
-        receiveGateway.init(new SDPNodeEthAddress(address, port), tmpNode);
-        Configuration conf = ConfigurationFactory.getConfiguration();
-        receiveNode = SCSFactory.createSCSInstance(tmpNode, conf);
-        receiveNode.setDataListener(new SCSDataListener() {
-            @Override
-            public void receive(int signalID, SCSData data) {
-                lock.lock();
-                try {
-                    if (listener != null) {
-                        listener.receiveData(signalID, data);
-                    }
-                    LinkedList<SCSData> tmp = getReceivedValuesFor(signalID);
-                    if (tmp != null) {
-                        tmp.add(0, data);
-                        if (tmp.size() >= 11) {
-                            tmp.remove(10);
-                        }
-                    } else {
-                        tmp = new LinkedList<>();
-                        tmp.add(data);
-                    }
-                    receivedData.put(signalID, tmp);
-                } finally {
-                    lock.unlock();
-                }
-            }
-
-            @Override
-            public SCSData request(int signalID) {
-                return null;
-            }
-        });
-        receiveGateway.start();
-        subscribeForAll(receiveNode);
-    }
-
     public LinkedList<SCSData> getReceivedValuesFor(int signalID) {
         return receivedData.get(signalID);
     }
 
-    public SCSData getLastSentValueFor(int signalID){
+    public SCSData getLastSentValueFor(int signalID) {
         return lastValueSent.get(signalID);
     }
 }
