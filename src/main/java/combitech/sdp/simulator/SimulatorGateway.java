@@ -9,7 +9,6 @@ import android.swedspot.sdp.ConnectionStatus;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
 import android.swedspot.sdp.observer.SDPConnectionListener;
-import android.swedspot.sdp.observer.SDPDataListener;
 import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
@@ -98,7 +97,7 @@ public class SimulatorGateway {
     }
 
     public boolean addAndInitiateNode(String address, int port,
-            SDPConnectionListener connectionListener, SCSStatusListener statusListener) {
+            SDPConnectionListener connectionListener, SCSStatusListener statusListener, ReceiveListener listener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
@@ -127,15 +126,18 @@ public class SimulatorGateway {
             SCS node = SCSFactory.createSCSInstance(tmpNode, conf);
             node.setDataListener(new SCSDataListener() {
                 @Override public void receive(int signalID, SCSData data) {
+                    if(listener != null){
+                        listener.receiveData(signalID, data);
+                    }
                     lock.lock();
                     try {
                         LinkedList<SCSData> dataList = receivedData.get(signalID);
-                        if(dataList != null){
+                        if (dataList != null) {
                             dataList.add(data);
                         } else {
                             dataList = new LinkedList<>();
                             dataList.add(data);
-                            receivedData.put(signalID,dataList);
+                            receivedData.put(signalID, dataList);
                         }
                     } finally {
                         lock.unlock();
@@ -172,8 +174,9 @@ public class SimulatorGateway {
     }
 
     public boolean addAndInitiateNode(String address, int port,
-            SDPConnectionListener connectionListener) {
-        return addAndInitiateNode(address, port, connectionListener, null);
+            SDPConnectionListener connectionListener, ReceiveListener listener)
+    {
+        return addAndInitiateNode(address, port, connectionListener, null, listener);
     }
 
     /**

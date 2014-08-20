@@ -44,7 +44,7 @@ public class SteeringWheelTests {
                     notifyAll();
                 }
             }
-        }),"Test Node Thread");
+        }, null),"Test Node Thread");
 
 
         server.addListener(new HardwareButtonListener() {

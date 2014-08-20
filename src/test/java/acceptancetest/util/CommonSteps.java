@@ -52,7 +52,7 @@ public class CommonSteps {
 
     @Given("^Add a node to simulator on port (\\d+) and ip (.*)$")
     public void addNode(int port, String ipAddress) {
-        staticSimulator.addAndInitiateNode(ipAddress, port, null);
+        staticSimulator.addAndInitiateNode(ipAddress, port, null, null);
     }
 
     @And("^After (\\d+) mSec have passed$")

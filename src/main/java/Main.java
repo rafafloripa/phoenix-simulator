@@ -8,9 +8,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
         String ipaddress = "localhost";
         SimulatorGateway gateway = new SimulatorGateway();
-        gateway.addAndInitiateNode(ipaddress, 8251, null);
-        gateway.addAndInitiateNode(ipaddress, 9898, null);
-        gateway.addAndInitiateNode(ipaddress, 9899, null);
+        gateway.addAndInitiateNode(ipaddress, 8251, null, null);
+        gateway.addAndInitiateNode(ipaddress, 9898, null, null);
+        gateway.addAndInitiateNode(ipaddress, 9899, null, null);
         Torcs torcs = new Torcs(gateway);
         GXT27Module gtGxt27Module = new GXT27Module(gateway);
         gtGxt27Module.startModule();
