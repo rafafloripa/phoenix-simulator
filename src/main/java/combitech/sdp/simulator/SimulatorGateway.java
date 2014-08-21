@@ -34,6 +34,7 @@ public class SimulatorGateway {
     private ReentrantLock lock;
     private Thread countdownThread;
     private boolean isConnected = false;
+    private boolean isConnecting = false; 
 
     public SimulatorGateway() {
         simulatorGateways = new LinkedList<>();
@@ -73,6 +74,7 @@ public class SimulatorGateway {
     }
 
     public void startCountdown() {
+        isConnecting = true; 
         lock.lock();
         try {
             if (countdownThread == null) {
@@ -92,9 +94,12 @@ public class SimulatorGateway {
                 countdownThread.start();
             }
         } finally {
+            isConnecting = false; 
             lock.unlock();
         }
     }
+    
+    
 
     public boolean addAndInitiateNode(String address, int port,
             SDPConnectionListener connectionListener, SCSStatusListener statusListener, ReceiveListener listener) {
@@ -349,5 +354,9 @@ public class SimulatorGateway {
 
     public SCSData getLastSentValueFor(int signalID) {
         return lastValueSent.get(signalID);
+    }
+    
+    public boolean isConnecting(){
+        return isConnecting;
     }
 }
