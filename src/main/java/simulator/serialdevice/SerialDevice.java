@@ -17,7 +17,7 @@ public class SerialDevice extends BasicModule implements
         SerialPortEventListener {
     private static final int TIME_OUT = 2000;
     private static final int DATA_RATE = 9600;
-    private static final int SIGNAL_ID = 515;
+    private static final int SIGNAL_ID = 56833;
     private BufferedReader input;
     private SerialPort serialPort;
     private CommPortIdentifier portId = null;
