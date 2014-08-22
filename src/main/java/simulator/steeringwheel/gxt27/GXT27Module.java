@@ -47,7 +47,6 @@ public class GXT27Module extends BasicModule {
     private Controller getController() throws Exception {
         // LOGGER.debug("Looking for controller");
 
-
         if (System.getProperty("net.java.games.input.librarypath") == null) {
             String binPath = getBinPath();
             if (binPath != null)
@@ -78,14 +77,14 @@ public class GXT27Module extends BasicModule {
         binPath = binPath.substring(1).replace("/", File.separator);
 
         int indexOfBuild = binPath.indexOf("build");
-        if (indexOfBuild> -1) // Gradle
+        if (indexOfBuild > -1) // Gradle
         {
             binPath = binPath.substring(0, indexOfBuild + 5);
             return binPath;
         }
 
         int indexOfBin = binPath.indexOf("bin");
-        if (indexOfBin> -1) // no Gradle
+        if (indexOfBin > -1) // no Gradle
         {
             binPath = binPath.substring(0, indexOfBin + 3);
             return binPath;
@@ -105,7 +104,6 @@ public class GXT27Module extends BasicModule {
 
     private void updateControllerModel(boolean didPoll) {
         if (didPoll) {
-
             com = controller.getComponent(Button._8);
             if (com.getPollData() > 0) {
                 model.home = true;

@@ -5,6 +5,7 @@ import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.SCSStatusListener;
 import android.swedspot.scs.data.SCSData;
+import android.swedspot.scs.data.Uint32;
 import android.swedspot.sdp.ConnectionStatus;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
@@ -282,8 +283,22 @@ public class SimulatorGateway {
             for (SCS node : signalNodes) {
                 for (Entry<Integer, Integer> entry : provideMap.entrySet()) {
                     node.provide(entry.getKey());
+                    System.out.println("providing " + entry.getKey());
                 }
             }
+            for (SCS node : hardwareKeyNodes) {
+                if (provideMap.keySet().contains(HARDWARE_KEY_ID)) {
+                    node.provide(HARDWARE_KEY_ID);
+                    System.out.println("providing hardware key");
+                }
+            }
+            for (SCS node : driverDistractionNodes) {
+                if (provideMap.keySet().contains(DRIVER_DISTRACTION_LEVEL_DATA_ID)) {
+                    node.provide(DRIVER_DISTRACTION_LEVEL_DATA_ID);
+                    System.out.println("providing driver distraction");
+                }
+            }
+
         } finally {
             lock.unlock();
         }
@@ -303,7 +318,7 @@ public class SimulatorGateway {
             if (signalID == HARDWARE_KEY_ID) {
                 for (SCS node : hardwareKeyNodes) {
                     node.send(signalID, data);
-                    // System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
+                    //System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
                 }
             }
             if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
