@@ -13,7 +13,6 @@ public abstract class BasicModule implements Runnable {
     }
 
     public void startModule() {
-        provide();
         state = SimulationModuleState.RUNNING;
         moduleThread = new Thread(this);
         moduleThread.start();
@@ -21,7 +20,6 @@ public abstract class BasicModule implements Runnable {
 
     public void stopModule() {
         state = SimulationModuleState.STOPPED;
-        unprovide();
         try {
             moduleThread.join();
         } catch (InterruptedException e) {
@@ -35,6 +33,7 @@ public abstract class BasicModule implements Runnable {
 
     public abstract int[] getProvidingSignals();
 
+    @Deprecated
     protected void provide() {
         for (int signalID : getProvidingSignals()) {
             gateway.provideSignal(signalID);
@@ -42,6 +41,7 @@ public abstract class BasicModule implements Runnable {
         }
     }
 
+    @Deprecated
     protected void unprovide() {
         for (int signalID : getProvidingSignals())
             gateway.unprovideSignal(signalID);
