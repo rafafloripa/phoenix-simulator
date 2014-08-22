@@ -328,10 +328,15 @@ public class SimulatorGateway {
     public void disconnectSimulator() {
         lock.lock();
         try {
-            for (SDPGatewayNode simulatorGateway : simulatorGateways) {
-                simulatorGateway.stop();
-            }
+            provideMap.keySet().forEach(providedSignal -> {
+                simulatorGateways.forEach(gateway -> gateway.unprovide(providedSignal));
+            });
+            simulatorGateways.forEach(gateway -> gateway.stop());
             simulatorGateways.clear();
+            hardwareKeyNodes.clear();
+            driverDistractionNodes.clear();
+            signalNodes.clear();
+            provideMap.clear();
         } finally {
             lock.unlock();
         }
