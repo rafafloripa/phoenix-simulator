@@ -334,8 +334,8 @@ public class SimulatorGateway {
             for (SDPGatewayNode simulatorGateway : simulatorGateways) {
                 simulatorGateway.stop();
             }
-            simulatorGateways.clear();
         } finally {
+            simulatorGateways.clear();
             lock.unlock();
         }
     }
