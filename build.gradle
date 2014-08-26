@@ -22,6 +22,7 @@ jacocoTestReport {
 }
 
 jar {
+    baseName='simulator'
     manifest {
         attributes 'Implementation-Title': 'Simulator', 'Implementation-Version': version
     }

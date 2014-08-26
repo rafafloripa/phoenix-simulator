@@ -353,6 +353,7 @@ public class SimulatorGateway {
             signalNodes.clear();
             provideMap.clear();
         } finally {
+            simulatorGateways.clear();
             lock.unlock();
         }
     }
