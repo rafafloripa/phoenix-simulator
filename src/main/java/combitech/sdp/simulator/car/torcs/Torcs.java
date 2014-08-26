@@ -25,6 +25,7 @@ public class Torcs extends BasicModule {
     long distance;
     private float engineSpeed;
     private float acceleratorPedalPosition;
+    private Socket clientSocket;
 
     public Torcs(SimulatorGateway gateway) {
         super(gateway);
@@ -53,19 +54,18 @@ public class Torcs extends BasicModule {
                 e.printStackTrace();
             }
 
-            Socket clientSocket;
+
             try {
-                // System.out.println("Awaiting connection");
+                //System.out.println("Awaiting connection");
                 clientSocket = welcomeSocket.accept();
-                // System.out.println("Got connection");
+                //System.out.println("Got connection");
 
                 BufferedReader inFromTorcs = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));
 
                 while (state == SimulationModuleState.RUNNING && clientSocket.isConnected()) {
-
                     signalUpdate = inFromTorcs.readLine();
-                    if (signalUpdate.length() > 70) {
+                    if (signalUpdate.length() > 50) {
                         extractValues(signalUpdate.trim());
                         gateway.sendValue(
                                 AutomotiveSignalId.FMS_WHEEL_BASED_SPEED,
@@ -108,8 +108,14 @@ public class Torcs extends BasicModule {
 
     @Override
     public void stopModule() {
+        state = SimulationModuleState.STOPPED;
         try {
-            welcomeSocket.close();
+            if (clientSocket != null) {
+                clientSocket.close();
+            }
+            if (welcomeSocket != null) {
+                welcomeSocket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

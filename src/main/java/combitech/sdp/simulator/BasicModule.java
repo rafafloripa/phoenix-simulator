@@ -1,7 +1,5 @@
 package combitech.sdp.simulator;
 
-import java.util.Arrays;
-
 public abstract class BasicModule implements Runnable {
 
     protected SimulatorGateway gateway;
@@ -21,7 +19,9 @@ public abstract class BasicModule implements Runnable {
     public void stopModule() {
         state = SimulationModuleState.STOPPED;
         try {
-            moduleThread.join();
+            if (moduleThread != null) {
+                moduleThread.join();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
