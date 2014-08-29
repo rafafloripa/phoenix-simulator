@@ -152,7 +152,7 @@ task acceptanceTest() {
 
 task copyArtifacts(type: Copy) {
     from 'build/libs'
-    into '/srv/repo/artifacts/Simulator-FX/SNAPSHOT/'
+    into '/srv/repo/artifacts/Simulator/SNAPSHOT/'
 }
 
 pmd {
