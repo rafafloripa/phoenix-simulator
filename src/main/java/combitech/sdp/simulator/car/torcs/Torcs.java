@@ -7,6 +7,8 @@ import android.swedspot.scs.data.SCSShort;
 import combitech.sdp.simulator.BasicModule;
 import combitech.sdp.simulator.SimulationModuleState;
 import combitech.sdp.simulator.SimulatorGateway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +28,7 @@ public class Torcs extends BasicModule {
     private float engineSpeed;
     private float acceleratorPedalPosition;
     private Socket clientSocket;
+    private final static Logger LOGGER = LoggerFactory.getLogger(Torcs.class);
 
     public Torcs(SimulatorGateway gateway) {
         super(gateway);
@@ -49,11 +52,12 @@ public class Torcs extends BasicModule {
         String signalUpdate;
         while (state == SimulationModuleState.RUNNING) {
             try {
-                welcomeSocket = new ServerSocket(6000);
+                if (welcomeSocket == null) {
+                    welcomeSocket = new ServerSocket(6000);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
 
             try {
                 //System.out.println("Awaiting connection");
@@ -65,7 +69,10 @@ public class Torcs extends BasicModule {
 
                 while (state == SimulationModuleState.RUNNING && clientSocket.isConnected()) {
                     signalUpdate = inFromTorcs.readLine();
-                    if (signalUpdate.length() > 50) {
+                    if (signalUpdate == null) {
+                        break;
+                    }
+                    if (signalUpdate.length() > 30) {
                         extractValues(signalUpdate.trim());
                         gateway.sendValue(
                                 AutomotiveSignalId.FMS_WHEEL_BASED_SPEED,
@@ -99,8 +106,8 @@ public class Torcs extends BasicModule {
             speed = Float.parseFloat(values[2]);
             fuelConsumption = Float.parseFloat(values[3]);
             distance = Long.parseLong(values[4]);
-            engineSpeed = Float.parseFloat(values[5]);
-            acceleratorPedalPosition = Float.parseFloat(values[6]);
+            //engineSpeed = Float.parseFloat(values[5]);
+            //acceleratorPedalPosition = Float.parseFloat(values[6]);
         } catch (Exception e) {
             e.printStackTrace();
         }
