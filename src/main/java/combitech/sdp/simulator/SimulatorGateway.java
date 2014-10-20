@@ -46,13 +46,30 @@ public class SimulatorGateway {
         lock = new ReentrantLock();
         lastValueSent = new HashMap<>();
         receivedData = new HashMap<>();
-        collectedIds = collectAllIds();
+        collectedIds = collectAllIds(false);
     }
 
-    public static LinkedList<Integer> collectAllIds() {
+    public SimulatorGateway(final boolean debugSignals) {
+        simulatorGateways = new LinkedList<>();
+        driverDistractionNodes = new LinkedList<>();
+        hardwareKeyNodes = new LinkedList<>();
+        signalNodes = new LinkedList<>();
+        provideMap = new HashMap<>();
+        lock = new ReentrantLock();
+        lastValueSent = new HashMap<>();
+        receivedData = new HashMap<>();
+        collectedIds = collectAllIds(debugSignals);
+    }
+
+    public static LinkedList<Integer> collectAllIds(final boolean debugSignals) {
         LinkedList<Integer> tmp = new LinkedList<>();
-        tmp.addAll(ConfigurationFactory.getConfiguration()
-                .getConfiguredSignals().keySet());
+        if (debugSignals) {
+            tmp.addAll(new SimulatorConfig()
+                    .getConfiguredSignals().keySet());
+        } else {
+            tmp.addAll(ConfigurationFactory.getConfiguration()
+                    .getConfiguredSignals().keySet());
+        }
         return tmp;
     }
 
