@@ -1,11 +1,15 @@
 package combitech.sdp.simulator;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantLock;
+
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
 import android.swedspot.scs.SCSStatusListener;
 import android.swedspot.scs.data.SCSData;
-import android.swedspot.scs.data.Uint32;
 import android.swedspot.sdp.ConnectionStatus;
 import android.swedspot.sdp.SDPFactory;
 import android.swedspot.sdp.configuration.Configuration;
@@ -13,13 +17,9 @@ import android.swedspot.sdp.observer.SDPConnectionListener;
 import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
+
 import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.configuration.VilConstants;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map.Entry;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SimulatorGateway {
     private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
@@ -100,9 +100,8 @@ public class SimulatorGateway {
         }
     }
 
-
     public boolean addAndInitiateNode(String address, int port,
-                                      SDPConnectionListener connectionListener, SCSStatusListener statusListener, ReceiveListener listener) {
+            SDPConnectionListener connectionListener, SCSStatusListener statusListener, ReceiveListener listener) {
         SDPNode tmpNode = SDPFactory.createNodeInstance();
         SDPGatewayNode simulatorGateway = SDPFactory
                 .createGatewayClientInstance();
@@ -122,7 +121,7 @@ public class SimulatorGateway {
         }
 
         simulatorGateway.start();
-        Configuration conf = ConfigurationFactory.getConfiguration();
+        Configuration conf = new SimulatorConfig();
 
         lock.lock();
         try {
@@ -181,7 +180,7 @@ public class SimulatorGateway {
     }
 
     public boolean addAndInitiateNode(String address, int port,
-                                      SDPConnectionListener connectionListener, ReceiveListener listener) {
+            SDPConnectionListener connectionListener, ReceiveListener listener) {
         return addAndInitiateNode(address, port, connectionListener, null, listener);
     }
 
@@ -191,7 +190,8 @@ public class SimulatorGateway {
      * @param signalID
      */
     public void provideSignal(int signalID) {
-        // System.out.println("SimulatorGateway is providing signal; " + signalID);
+        // System.out.println("SimulatorGateway is providing signal; " +
+        // signalID);
         lock.lock();
         try {
             if (!provideMap.containsKey(signalID)) {
@@ -200,22 +200,25 @@ public class SimulatorGateway {
                     for (SCS node : driverDistractionNodes) {
                         node.unsubscribe(signalID);
                         node.provide(signalID);
-                        // System.out.println("Providing signal " + signalID + " on driver distraction node");
+                        // System.out.println("Providing signal " + signalID +
+                        // " on driver distraction node");
                     }
                 } else if (signalID == HARDWARE_KEY_ID) {
                     for (SCS node : hardwareKeyNodes) {
                         node.unsubscribe(signalID);
                         node.provide(signalID);
-                        // System.out.println("Providing signal " + signalID + " on hardware node");
+                        // System.out.println("Providing signal " + signalID +
+                        // " on hardware node");
                     }
                 } else {
                     for (SCS node : signalNodes) {
                         node.unsubscribe(signalID);
                         node.provide(signalID);
-                        // System.out.println("Providing signal " + signalID + " on data node");
+                        // System.out.println("Providing signal " + signalID +
+                        // " on data node");
                     }
-                    //System.out.println("providing: " + signalID
-                    //        + " on signalNodes");
+                    // System.out.println("providing: " + signalID
+                    // + " on signalNodes");
                 }
             } else {
                 provideMap.put(signalID, provideMap.get(signalID) + 1);
@@ -318,7 +321,8 @@ public class SimulatorGateway {
             if (signalID == HARDWARE_KEY_ID) {
                 for (SCS node : hardwareKeyNodes) {
                     node.send(signalID, data);
-                    //System.out.println("GXT27 Steering Wheel module is sending" + new Uint32(data.getData()).getIntValue());
+                    // System.out.println("GXT27 Steering Wheel module is sending"
+                    // + new Uint32(data.getData()).getIntValue());
                 }
             }
             if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {

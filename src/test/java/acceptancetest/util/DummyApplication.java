@@ -3,8 +3,6 @@ package acceptancetest.util;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import com.swedspot.vil.configuration.ConfigurationFactory;
-
 import android.swedspot.scs.SCS;
 import android.swedspot.scs.SCSDataListener;
 import android.swedspot.scs.SCSFactory;
@@ -17,6 +15,8 @@ import android.swedspot.sdp.observer.SDPGatewayNode;
 import android.swedspot.sdp.observer.SDPNode;
 import android.swedspot.sdp.routing.SDPNodeEthAddress;
 import android.swedspot.sdp.util.Converter;
+
+import combitech.sdp.simulator.SimulatorConfig;
 
 public class DummyApplication {
     SDPNode dummyAppNode;
@@ -31,7 +31,7 @@ public class DummyApplication {
 
         dummyAppGateway = SDPFactory.createGatewayServerInstance();
         dummyAppGateway.init(new SDPNodeEthAddress("localhost", portToRunOn), dummyAppNode);
-        Configuration conf = ConfigurationFactory.getConfiguration();
+        Configuration conf = new SimulatorConfig();
         dummySCSNode = SCSFactory.createSCSInstance(dummyAppNode, conf);
         dummySCSNode.setDataListener(new SCSDataListener() {
 
@@ -77,8 +77,8 @@ public class DummyApplication {
     public void stop() {
         dummyAppGateway.stop();
         for (int i = 0; i < dummyAppGateway.connections().size(); i++) {
-        	dummyAppGateway.disconnect(dummyAppGateway.connections().iterator().next());
-		}
+            dummyAppGateway.disconnect(dummyAppGateway.connections().iterator().next());
+        }
         dummyAppGateway = null;
     }
 }
