@@ -27,6 +27,8 @@ import com.swedspot.automotiveapi.AutomotiveManager;
 import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.distraction.DriverDistractionLevel;
 import com.swedspot.vil.distraction.DriverDistractionListener;
+import com.swedspot.vil.distraction.LightMode;
+import com.swedspot.vil.distraction.StealthMode;
 import com.swedspot.vil.policy.AutomotiveCertificate;
 
 public class Server implements Runnable, DriverDistractionListener,
@@ -57,6 +59,7 @@ public class Server implements Runnable, DriverDistractionListener,
         System.exit(1);
     }
 
+    @Override
     public void levelChanged(DriverDistractionLevel level) {
         System.out.println("driver distraction level changed to "
                 + level.getLevel());
@@ -75,8 +78,18 @@ public class Server implements Runnable, DriverDistractionListener,
         }
     }
 
-    public void timeout(int arg0) {
-        System.out.println("Timeout for: " + arg0);
+    @Override
+    public void lightModeChanged(final LightMode lightMode) {
+        // TODO
+    }
+
+    @Override
+    public void stealthModeChanged(final StealthMode stealthMode) {
+        // TODO
+    }
+
+    public void timeout(final int signalId) {
+        System.out.println("Timeout for: " + signalId);
     }
 
     public void receive(AutomotiveSignal signal) {
@@ -95,8 +108,8 @@ public class Server implements Runnable, DriverDistractionListener,
         }
     }
 
-    public void notAllowed(int arg0) {
-        System.out.println("Not allowed: " + arg0);
+    public void notAllowed(final int signalId) {
+        System.out.println("Not allowed: " + signalId);
     }
 
     public void startServer() {
