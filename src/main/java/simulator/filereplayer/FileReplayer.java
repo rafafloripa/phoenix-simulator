@@ -1,22 +1,24 @@
 package simulator.filereplayer;
 
-import android.swedspot.scs.data.Uint32;
-import combitech.sdp.simulator.BasicModule;
-import combitech.sdp.simulator.SimulationModuleState;
-import combitech.sdp.simulator.SimulatorGateway;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+
+import android.swedspot.scs.data.Uint32;
+
+import combitech.sdp.simulator.BasicModule;
+import combitech.sdp.simulator.SimulationModuleState;
+import combitech.sdp.simulator.SimulatorGateway;
 
 public class FileReplayer extends BasicModule {
 
     private BufferedReader br;
-    private ArrayList<ReplayerDataRow> dataValues;
-    private LinkedList<Integer> providedIDs;
+    private List<ReplayerDataRow> dataValues;
+    private List<Integer> providedIDs;
     private int index;
     private long timeDiff;
     private long previousTimestamp;
@@ -99,11 +101,11 @@ public class FileReplayer extends BasicModule {
         }
     }
 
-    public ArrayList<ReplayerDataRow> getDataValues() {
+    public List<ReplayerDataRow> getDataValues() {
         return dataValues;
     }
 
-    public LinkedList<Integer> getProvidedIDs() {
+    public List<Integer> getProvidedIDs() {
         return providedIDs;
     }
 

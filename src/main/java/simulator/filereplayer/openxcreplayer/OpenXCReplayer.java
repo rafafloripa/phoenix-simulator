@@ -1,26 +1,33 @@
 package simulator.filereplayer.openxcreplayer;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.swedspot.automotiveapi.AutomotiveSignalId;
 import android.swedspot.scs.data.SCSData;
 import android.swedspot.scs.data.SCSFloat;
 import android.swedspot.scs.data.SCSShort;
 import android.swedspot.scs.data.Uint8;
+
 import combitech.sdp.simulator.BasicModule;
 import combitech.sdp.simulator.SimulationModuleState;
 import combitech.sdp.simulator.SimulatorGateway;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.LinkedList;
 
 public class OpenXCReplayer extends BasicModule {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OpenXCReplayer.class);
     private BufferedReader br;
     private File file;
-    private LinkedList<Integer> availableIDs;
-    private LinkedList<Integer> sendingIDs;
+    private List<Integer> availableIDs;
+    private List<Integer> sendingIDs;
 
     private long previousSystemTimestamp;
     private long currentSystemTimestamp;
@@ -112,7 +119,8 @@ public class OpenXCReplayer extends BasicModule {
                     }
 
                     SCSData data = convertToSCSData(extractName(newLine), extractValue(newLine));
-                    // System.out.println("sending id: " + id + " with value: " + extractValue(newLine));
+                    // System.out.println("sending id: " + id + " with value: "
+                    // + extractValue(newLine));
                     gateway.sendValue(id, data);
                 }
             }

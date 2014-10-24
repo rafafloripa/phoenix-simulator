@@ -2,6 +2,8 @@ package combitech.sdp.simulator;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,16 +24,19 @@ import com.swedspot.vil.configuration.ConfigurationFactory;
 import com.swedspot.vil.configuration.VilConstants;
 
 public class SimulatorGateway {
-    private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 513;
-    private static final int HARDWARE_KEY_ID = 514;
-    private HashMap<Integer, Integer> provideMap;
-    private HashMap<Integer, SCSData> lastValueSent;
-    private LinkedList<SDPGatewayNode> simulatorGateways;
-    private LinkedList<SCS> driverDistractionNodes;
-    private LinkedList<SCS> hardwareKeyNodes;
-    private LinkedList<SCS> signalNodes;
-    private HashMap<Integer, LinkedList<SCSData>> receivedData;
-    private LinkedList<Integer> collectedIds;
+    private static final int DRIVER_DISTRACTION_LEVEL_DATA_ID = 0x0201;
+    private static final int HARDWARE_KEY_ID = 0x0202;
+    private static final int LIGHT_MODE_DATA_ID = 0x0203;
+    private static final int STEALTH_MODE_DATA_ID = 0x0204;
+
+    private Map<Integer, Integer> provideMap;
+    private Map<Integer, SCSData> lastValueSent;
+    private List<SDPGatewayNode> simulatorGateways;
+    private List<SCS> driverDistractionNodes;
+    private List<SCS> hardwareKeyNodes;
+    private List<SCS> signalNodes;
+    private Map<Integer, LinkedList<SCSData>> receivedData;
+    private List<Integer> collectedIds;
     private ReentrantLock lock;
     private Thread countdownThread;
     private boolean isConnected = false;
@@ -213,7 +218,7 @@ public class SimulatorGateway {
         try {
             if (!provideMap.containsKey(signalID)) {
                 provideMap.put(signalID, 1);
-                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID || signalID == LIGHT_MODE_DATA_ID || signalID == STEALTH_MODE_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.unsubscribe(signalID);
                         node.provide(signalID);
@@ -254,7 +259,7 @@ public class SimulatorGateway {
         lock.lock();
         try {
             if (provideMap.containsKey(signalID)) {
-                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID || signalID == LIGHT_MODE_DATA_ID || signalID == STEALTH_MODE_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.unprovide(signalID);
                         node.subscribe(signalID);
@@ -317,6 +322,14 @@ public class SimulatorGateway {
                     node.provide(DRIVER_DISTRACTION_LEVEL_DATA_ID);
                     System.out.println("providing driver distraction");
                 }
+                if (provideMap.keySet().contains(LIGHT_MODE_DATA_ID)) {
+                    node.provide(LIGHT_MODE_DATA_ID);
+                    System.out.println("providing light mode data");
+                }
+                if (provideMap.keySet().contains(STEALTH_MODE_DATA_ID)) {
+                    node.provide(STEALTH_MODE_DATA_ID);
+                    System.out.println("providing stealth mode data");
+                }
             }
 
         } finally {
@@ -343,7 +356,7 @@ public class SimulatorGateway {
                 }
             }
             if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
-                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID) {
+                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID || signalID == LIGHT_MODE_DATA_ID || signalID == STEALTH_MODE_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.send(signalID, data);
                     }
