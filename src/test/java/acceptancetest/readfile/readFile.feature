@@ -18,12 +18,13 @@ Feature: reading a data file and sending the data
     #The ExampleData file contains the signals from the table below
     
     When The simulator start replaying
+    And After 2000 mSec have passed
     Then The DummyApp should have received all data
       | TimeStamp | SignalID | Value      |
       | 0         | 151      | 2147483647 |
-      | 100       | 151      | 15         |
-      | 200       | 151      | 16         |
-      | 400       | 151      | 11         |
+      | 200       | 151      | 15         |
+      | 400       | 151      | 16         |
+      | 600       | 151      | 11         |
       | 800       | 151      | 10         |
       | 1600      | 150      | 555        |
-      | 1601      | 150      | 90         |
+      | 1801      | 150      | 90         |

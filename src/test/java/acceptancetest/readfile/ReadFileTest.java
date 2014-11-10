@@ -7,7 +7,7 @@ import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-		features = "classpath:acceptancetest/readfile/readFile.feature", 
+		features = "src/test/java/acceptancetest/readfile/readFile.feature",
 		glue = { "acceptancetest.readfile", "acceptancetest.util" }, 
 		monochrome = true, 
 		format = {"pretty", "json:build/cucumber-reports/cucumber.json"})

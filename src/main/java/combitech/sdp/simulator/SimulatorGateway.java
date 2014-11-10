@@ -355,15 +355,13 @@ public class SimulatorGateway {
                     // + new Uint32(data.getData()).getIntValue());
                 }
             }
-            if (lastValueSent.get(signalID) == null) {
-                if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID || signalID == LIGHT_MODE_DATA_ID || signalID == STEALTH_MODE_DATA_ID) {
-                    for (SCS node : driverDistractionNodes) {
-                        node.send(signalID, data);
-                    }
-                } else {
-                    for (SCS node : signalNodes) {
-                        node.send(signalID, data);
-                    }
+            if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID || signalID == LIGHT_MODE_DATA_ID || signalID == STEALTH_MODE_DATA_ID) {
+                for (SCS node : driverDistractionNodes) {
+                    node.send(signalID, data);
+                }
+            } else {
+                for (SCS node : signalNodes) {
+                    node.send(signalID, data);
                 }
             }
             lastValueSent.put(signalID, data);

@@ -65,8 +65,8 @@ public class ReadFileSteps {
 				}
 				return true;
 			}
-		}, 8000, 500);
+		}, 10000, 400);
 
-		assertTrue("Not recieved the expected signals within 8 Sec.", result);
+		assertTrue("Not recieved the expected signals within 10 Sec.", result);
 	}
 }
