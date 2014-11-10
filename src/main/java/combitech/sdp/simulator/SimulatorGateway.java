@@ -355,7 +355,7 @@ public class SimulatorGateway {
                     // + new Uint32(data.getData()).getIntValue());
                 }
             }
-            if (lastValueSent.get(signalID) == null || !lastValueSent.get(signalID).equals(data)) {
+            if (lastValueSent.get(signalID) == null) {
                 if (signalID == DRIVER_DISTRACTION_LEVEL_DATA_ID || signalID == LIGHT_MODE_DATA_ID || signalID == STEALTH_MODE_DATA_ID) {
                     for (SCS node : driverDistractionNodes) {
                         node.send(signalID, data);
