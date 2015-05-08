@@ -14,7 +14,7 @@ public class Main {
             gateway.provideSignal(i);
         }
         
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         ets2.startModule();
     }
 }

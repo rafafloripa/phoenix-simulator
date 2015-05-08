@@ -86,13 +86,13 @@ public class EuroTruck extends BasicModule {
 								AutomotiveSignalId.FMS_WHEEL_BASED_SPEED,
 								new SCSFloat(speed));
 //						System.out.println(speed);
-						 gateway.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR,
-						 new SCSShort(currentGear));
-//						 System.out.println(currentGear);
-						 gateway.sendValue(AutomotiveSignalId.FMS_FUEL_LEVEL_1,
-						 new SCSFloat(fuelLevel));
-						 gateway.sendValue(AutomotiveSignalId.FMS_FUEL_RATE,
-						 new SCSFloat(fuelConsumption));
+//						 gateway.sendValue(AutomotiveSignalId.FMS_CURRENT_GEAR,
+//						 new SCSShort(currentGear));
+////						 System.out.println(currentGear);
+//						 gateway.sendValue(AutomotiveSignalId.FMS_FUEL_LEVEL_1,
+//						 new SCSFloat(fuelLevel));
+//						 gateway.sendValue(AutomotiveSignalId.FMS_FUEL_RATE,
+//						 new SCSFloat(fuelConsumption));
 						// gateway.sendValue(AutomotiveSignalId.FMS_HIGH_RESOLUTION_TOTAL_VEHICLE_DISTANCE,
 						// new SCSLong(distance));
 						// gateway.sendValue(AutomotiveSignalId.FMS_ENGINE_SPEED,
@@ -112,12 +112,12 @@ public class EuroTruck extends BasicModule {
 		String[] values = signalUpdate.split(",");
 
 		try {
-			fuelLevel = Float.parseFloat(values[22].substring(7));
-			fuelLevel /= 8;
-			currentGear = Short.parseShort(values[16].substring(7));
+//			fuelLevel = Float.parseFloat(values[22].substring(7));
+//			fuelLevel /= 8;
+//			currentGear = Short.parseShort(values[16].substring(7));
 			speed = Float.parseFloat(values[6].substring(13));
-			fuelConsumption = Float.parseFloat(values[24].substring(25));
-			fuelConsumption *= 100;
+//			fuelConsumption = Float.parseFloat(values[24].substring(25));
+//			fuelConsumption *= 100;
 			// distance = Long.parseLong(values[4]);
 			// engineSpeed = Float.parseFloat(values[5]);
 			// acceleratorPedalPosition = Float.parseFloat(values[6]);
